@@ -60,8 +60,8 @@ minetest.register_node("beer_test:barrel_mixed_ale_grain", {
 
 ale = {};
 ale.brewing={--//here are the brewing states it starts with the first one and continues to the last one with the time
-{time=15*60,name="Watery Malt",item="beer_test:barrel_watery_ale",ale_tankard="beer_test:tankard_unbrewed_ale"},
-{time=10*60,name="Fermetting Malt",item="beer_test:barrel_fermenting_ale",ale_tankard="beer_test:tankard_unbrewed_ale"},
+{time=15*60,name="Ale Wart",item="beer_test:barrel_watery_ale",ale_tankard="beer_test:tankard_unbrewed_ale"},
+{time=10*60,name="Fermetting Ale",item="beer_test:barrel_fermenting_ale",ale_tankard="beer_test:tankard_unbrewed_ale"},
 {time=10*60,name="Light Ale",item="beer_test:barrel_light_ale",ale_tankard="beer_test:tankard_light_ale"},
 {time=10*60,name="Normal Ale",item="beer_test:barrel_ale",ale_tankard="beer_test:tankard_ale"},
 {time=1,name="Dark Ale",item="beer_test:barrel_dark_ale",ale_tankard="beer_test:tankard_dark_ale"}
@@ -191,7 +191,7 @@ minetest.register_node("beer_test:barrel_ale_brewed", {
 
 -- types of ales --
 minetest.register_tool("beer_test:barrel_watery_ale", {
-    description = "Ale Barrel (Watery Malt)",
+    description = "Ale Barrel (Wart)",
     inventory_image = minetest.inventorycube("beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png"),
 	on_place = ale.place,
 	on_drop = ale.place
@@ -220,93 +220,7 @@ minetest.register_tool("beer_test:barrel_dark_ale", {
 	on_place = ale.place,
 	on_drop = ale.place
 })
---[[
---Watery Malt
-minetest.register_node("beer_test:barrel_ale", {
-   description = "Ale Barrel (Watery Malt)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_construct = function(pos)
-         local meta = minetest.get_meta(pos)
-         meta:set_string("infotext", "Beer (Watery Malt)")
-      end,
-    
-   on_punch = ale.punched
-})
---Fermeting Malt
-minetest.register_node("beer_test:barrel_ale_1", {
-   description = "Ale Barrel (Fermenting Malt)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_construct = function(pos)
-         local meta = minetest.get_meta(pos)
-         meta:set_string("infotext", "Beer (Fermenting Malt)")
-      end,
-    
-   on_punch = ale.punched
-})
---Light Beer
-minetest.register_node("beer_test:barrel_ale_2", {
-   description = "Ale Barrel (Light Beer)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_construct = function(pos)
-         local meta = minetest.get_meta(pos)
-         meta:set_string("infotext", "Beer (Light Beer)")
-      end,
-    
-   on_punch = ale.punched
-})
---Normal beer
-minetest.register_node("beer_test:barrel_ale_3", {
-   description = "Beer Barrel (Normal Beer)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_construct = function(pos)
-         local meta = minetest.get_meta(pos)
-         meta:set_string("infotext", "Ale (Normal Ale)")
-      end,
-    
-   on_punch = ale.punched
-})
---Dark beer
-minetest.register_node("beer_test:barrel_ale_4", {
-   description = "Ale Barrel (Black Ale)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_construct = function(pos)
-         local meta = minetest.get_meta(pos)
-         meta:set_string("infotext", "Ale (Black Ale)")
-      end,
-    
-   on_punch = ale.punched
-})
-]]
+
 -- tankards beer --
 
 minetest.register_node("beer_test:tankard_unbrewed_ale", {

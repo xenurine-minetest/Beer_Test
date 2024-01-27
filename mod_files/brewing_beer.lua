@@ -58,8 +58,8 @@ minetest.register_node("beer_test:barrel_mixed_beer_grain", {
 
 beer = {};
 beer.brewing={--//here are the brewing states it starts with the first one and continues to the last one with the time
-{time=15*60,name="Watery Malt",item="beer_test:barrel_watery_malt",beer_tankard="beer_test:tankard_unbrewed_beer"},
-{time=10*60,name="Fermetting Malt",item="beer_test:barrel_fermenting_malt",beer_tankard="beer_test:tankard_unbrewed_beer"},
+{time=15*60,name="Beer Wart",item="beer_test:barrel_watery_malt",beer_tankard="beer_test:tankard_unbrewed_beer"},
+{time=10*60,name="Fermetting Beer",item="beer_test:barrel_fermenting_malt",beer_tankard="beer_test:tankard_unbrewed_beer"},
 {time=10*60,name="Light Beer",item="beer_test:barrel_light_beer",beer_tankard="beer_test:tankard_light_beer"},
 {time=10*60,name="Normal Beer",item="beer_test:barrel_beer",beer_tankard="beer_test:tankard_beer"},
 {time=1,name="Dark Beer",item="beer_test:barrel_dark_beer",beer_tankard="beer_test:tankard_dark_beer"}
@@ -221,81 +221,7 @@ minetest.register_tool("beer_test:barrel_dark_beer", {
 	on_place = beer.place,
 	on_drop = beer.place
 })
---[[
-minetest.register_node("beer_test:barrel_beer", {
-   description = "Beer Barrel (Watery Malt)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_punch = beer.punched,
-   on_dig = beer.dug,
-   on_place = beer.place
-})
---Fermeting Malt
 
-minetest.register_node("beer_test:barrel_beer_1", {
-   description = "Beer Barrel (Fermenting Malt)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_punch = beer.punched,
-   on_dig = beer.dug,
-   on_place = beer.place
-})
---Light Beer
-minetest.register_node("beer_test:barrel_beer_2", {
-	description = "Beer Barrel (Light Beer)",
-	tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-	"beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {cracky=2,not_in_creative_inventory=1},
-	drop = "beer_test:barrel", -- this is for now --
-	sounds = default.node_sound_barrel_defaults(),
-	on_punch = beer.punched,
-	on_dig = beer.dug,
-	on_place = beer.place
-})
-
---Normal beer
-minetest.register_node("beer_test:barrel_beer_3", {
-	description = "Beer Barrel (Normal Beer)",
-	tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-	"beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-	paramtype = "light",
-	paramtype2 = "facedir",
-	groups = {cracky=2,not_in_creative_inventory=1},
-	drop = "",
-	sounds = default.node_sound_barrel_defaults(),
-	on_punch = beer.punched,
-	on_dig = beer.dug,
-	on_place = beer.place
-})
-
---Dark beer
-minetest.register_node("beer_test:barrel_beer_4", {
-   description = "Beer Barrel (Dark Beer)",
-   tiles = {"beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side.png",
-   "beer_test_barrel_side.png", "beer_test_barrel_top.png", "beer_test_barrel_top.png"},
-   paramtype = "light",
-   paramtype2 = "facedir",
-   groups = {cracky=2,not_in_creative_inventory=1},
-   drop = "beer_test:barrel", -- this is for now --
-   sounds = default.node_sound_barrel_defaults(),
-   on_punch = beer.punched,
-   on_dig = beer.dug,
-   on_place = beer.place
-})
-
-]]
 
 -- tankards beer --
 minetest.register_node("beer_test:tankard_unbrewed_beer", {

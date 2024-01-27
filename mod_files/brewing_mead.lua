@@ -60,7 +60,7 @@ minetest.register_node("beer_test:barrel_mixed_mead_grain", {
 
 mead = {};
 mead.brewing={--//here are the brewing states it starts with the first one and continues to the last one with the time
-{time=15*60,name="Watery Apple Mead",item="beer_test:barrel_watery_mead",mead_tankard="beer_test:tankard_unbrewed_mead"},
+{time=15*60,name="Apple Mead Wart",item="beer_test:barrel_watery_mead",mead_tankard="beer_test:tankard_unbrewed_mead"},
 {time=10*60,name="Fermetting Apple Mead",item="beer_test:barrel_fermenting_mead",mead_tankard="beer_test:tankard_unbrewed_mead"},
 {time=10*60,name="Light Apple Mead",item="beer_test:barrel_light_mead",mead_tankard="beer_test:tankard_light_mead"},
 {time=10*60,name="Normal Apple Mead",item="beer_test:barrel_mead",mead_tankard="beer_test:tankard_mead"},

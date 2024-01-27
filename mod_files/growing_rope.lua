@@ -1,7 +1,8 @@
 -- Growing Rope --
 
--- The following code is based off of xpanes
 local S = minetest.get_translator("beer_test")
+
+-- The following code is based off of xpanes
 
 
 local function is_rope(pos)
@@ -118,7 +119,7 @@ function beer_test.register_rope(name, def )
 			connect_bottom = {{-0.1, -0.5, -0.1, 0.1, 0.1, 0.1}},
 
 		},
-		connects_to = {"group:rope", "group:stone", "group:glass", "group:wood", "group:tree", "beer_test:growing_rope_down"},
+		connects_to = {"group:rope", "group:stone", "group:glass", "group:wood", "group:tree", "beer_test:growing_rope_down", "beer_test:hops_9", "beer_test:hops_9a"},
 	})
 
 		minetest.register_craft({
@@ -129,7 +130,7 @@ function beer_test.register_rope(name, def )
 end
 
 beer_test.register_rope("growing_rope", {
-	description = S("Growing Rope"),
+	description = S("Growing Support Rope"),
 	textures = {"beer_test_rope.png","beer_test_rope.png","beer_test_rope.png"},
 	inventory_image = "beer_test_rope_item.png",
 	wield_image = "beer_test_rope_item.png",
