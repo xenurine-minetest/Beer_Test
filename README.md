@@ -1,6 +1,6 @@
 # Beer Test  #
 
-[Wiki ](https://bitbucket.org/kingarthursteam/beer-test/wiki/Home)
+[Wiki ](https://github.com/xenurine-minetest/Beer_Test/wiki)
 
 The Mod Which Adds Beer To Minetest
 
@@ -27,6 +27,8 @@ Stable Version 1.2.3
 
 ### More Info ###
 
-[Website](http://thatraspberrypiserver.raspberryip.com/Infinatum_Minetest/beer_test.html)
+[Website](http://minetest.thatrspiserver.co.uk/pages.html#Mods/Beer-Test)
 
-[Wiki ](https://bitbucket.org/kingarthursteam/beer-test/wiki/Home)
+[Wiki ](https://github.com/xenurine-minetest/Beer_Test/wiki)
+
+[Old Wiki ](https://bitbucket.org/kingarthursteam/beer-test/wiki/Home)
