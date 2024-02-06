@@ -71,6 +71,20 @@ fertility = {"grassland"}
 })
 
 
+farming.register_plant("beer_test:barley", {
+	description = "Barley Seed",
+	harvest_description = "Barley",
+	paramtype2 = "meshoptions",
+	inventory_image = "beer_test_barley_seed.png",
+	steps = 8,
+	minlight = 13,
+	maxlight = default.LIGHT_MAX,
+	fertility = {"grassland"},
+	groups = {food_wheat = 1, flammable = 4},
+	place_param2 = 3,
+})
+
+
 
 
 minetest.override_item("beer_test:hops_9", {
