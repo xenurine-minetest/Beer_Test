@@ -45,6 +45,10 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/other_mods.lua")
 print("Beer_test: Loading 'other_mods.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/growing_rope.lua")
 
+print("Beer_test: Loading 'malting.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/malting.lua")
+
+
 print("")
 print("###########################################################")
 print("Beer_Test has loaded successfully ")	
