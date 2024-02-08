@@ -45,8 +45,14 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/other_mods.lua")
 print("Beer_test: Loading 'other_mods.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/growing_rope.lua")
 
+-- new nodes --
+
 print("Beer_test: Loading 'malting.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/malting.lua")
+
+print("Beer_test: Loading 'barrel.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/barrel.lua")
+
 
 
 print("")

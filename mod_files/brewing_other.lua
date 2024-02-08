@@ -9,7 +9,7 @@ minetest.register_craftitem("beer_test:barrle_tap", {
 -----------------
 -- beer barrle --
 -----------------
-
+--[[ MOVED TO BARREL 
 minetest.register_node("beer_test:barrel", {
     description = "Barrel",
     drawtype = "nodebox",
@@ -66,7 +66,7 @@ minetest.register_node("beer_test:barrel", {
     }, 
 		
 })
-
+]]--
 -- tankard --
 
 minetest.register_node("beer_test:tankard", {
