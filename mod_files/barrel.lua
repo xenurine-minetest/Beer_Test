@@ -67,6 +67,10 @@ Barrel.new = function (pos)
         end
     end
 
+    self.allInventoriesEmpty = function ()
+        return inventory:is_empty("src") and inventory:is_empty("dst") and inventory:is_empty("liquid") and inventory:is_empty("buk")
+    end
+
 
     -- private methods
     setInventory = function (name, size)

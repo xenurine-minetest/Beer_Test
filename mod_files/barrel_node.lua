@@ -1,11 +1,11 @@
 local modname = minetest.get_current_modname()
 local Barrel = dofile(minetest.get_modpath(modname) .. "/mod_files/barrel.lua")
 
-function onConstruct (pos)
+local function onConstruct (pos)
     local barrel = Barrel.new(pos)
 end
 
-function onTimer (pos, time)
+local function onTimer (pos, time)
     local barrel = Barrel.new(pos)
     if (barrel.hasSoakingItems()) then
         barrel.soak()
@@ -17,10 +17,9 @@ function onTimer (pos, time)
     ]]--
 end
 
-function canDig (pos, player, node)
-    local meta = minetest.get_meta(pos);
-	local inv = meta:get_inventory()
-	return inv:is_empty("src") and inv:is_empty("dst")
+local function canDig (pos, player, node)
+    local barrel = Barrel.new(pos)
+	return barrel.allInventoriesEmpty()
 end
 
 minetest.register_node("beer_test:barrel",{
