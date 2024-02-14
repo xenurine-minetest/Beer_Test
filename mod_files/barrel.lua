@@ -48,17 +48,19 @@ Barrel.new = function (pos)
 
     self.soak = function ()
         local soakingItemStack, soakingItemStackIndex = getSoakingItemStack()
-        local takenSoaking = soakingItemStack:take_item(1)
+        local takenSoakingItem = soakingItemStack:take_item(1)
 
         local liquidStack = self.getLiquidStack()
-        local takenLiquid = liquidStack:take_item(1)
+        local takenLiquidItem = liquidStack:take_item(1)
 
-        if (takenSoaking:get_count() > 0 and takenLiquid:get_count() > 0) then
+        if (takenSoakingItem:get_count() > 0 and takenLiquidItem:get_count() > 0) then
             inventory:set_stack("src", soakingItemStackIndex, soakingItemStack)
             inventory:set_stack("liquid", 1, liquidStack)
 
             local dst_stack = inventory:get_stack('dst', 1)
-            dst_stack:add_item("beer_test:soaked_barley")
+            dst_stack:add_item(
+                beer_test.soakRecipeHandler.getDestinationForSource(takenSoakingItem:get_name())
+            )
             inventory:set_stack('dst', 1, dst_stack)
          
             local bucket_stack = inventory:get_stack('liquid', 1)
@@ -89,7 +91,7 @@ Barrel.new = function (pos)
     getSoakingItemStack = function ()
         local sourceInventory = self.getSourceInventory()
         for i, itemStack in ipairs(sourceInventory) do
-            if (itemStack:get_name() == "beer_test:cracked_barley") then
+            if (beer_test.soakRecipeHandler.isSoakSource(itemStack:get_name())) then
                 return itemStack, i
             end
         end
