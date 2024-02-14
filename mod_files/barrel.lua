@@ -3,7 +3,7 @@ local Barrel = {}
 Barrel.new = function (pos) 
     local self = {}
     -- private property declarations
-    local meta, inventory, getSoakingItemStack
+    local meta, inventory, getSoakingItemStack, liquidLevel, liquidLevelLimit, liquidType
 
     -- private method declarations
     local initialize,setInventory
@@ -73,6 +73,48 @@ Barrel.new = function (pos)
         return inventory:is_empty("src") and inventory:is_empty("dst") and inventory:is_empty("liquid") and inventory:is_empty("buk")
     end
 
+    self.fillLiquid = function (fillAmount, fillType)
+        fillAmount = toNumber(fillAmount)
+
+        if (liquidType ~= nil and liquidType ~= fillType) then
+            return fillAmount
+        end
+
+        if (liquidType == nil and liquidLevel == 0) then
+            liquidType = fillType
+        end
+        
+        if (fillAmount + liquidLevel > liquidLevelLimit) then
+            local oldLiquidLevel = liquidlevel
+            liquidlevel = liquidLevelLimit
+            return fillAmount + oldLiquidLevel - liquidLevelLimit
+        end
+
+        liquidLevel = liquidLevel + fillAmount
+
+        return 0
+    end
+
+    self.takeLiquid = function (amount)
+        amount = toNumber(amount)
+        local oldLiquidType = liquidType
+
+        if (liquidLevel < amount) then 
+            local oldLiquidLevel = liquidLevel
+            liquidLevel = 0
+            liquidType = nil
+            return oldLiquidLevel, oldLiquidType
+        end
+
+        liquidLevel = liquidlevel - amount
+
+        if (liquidLevel == 0) then
+            liquidType = nil
+        end 
+
+        return amount, oldLiquidType
+    end
+
 
     -- private methods
     setInventory = function (name, size)
@@ -84,6 +126,9 @@ Barrel.new = function (pos)
         setInventory("src", 1)
         setInventory("dst", 1)
         setInventory("buk", 1)
+        liquidLevel = 0
+        liquidLevelLimit = 500
+        liquidType = nil
         self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
         meta:set_int("initialized", 1)
     end
