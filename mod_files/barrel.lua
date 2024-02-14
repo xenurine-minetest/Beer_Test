@@ -22,8 +22,6 @@ Barrel.new = function (pos)
 
     -- public methods
     self.setFormSpec = function(formspec)
-        minetest.log("action", "set formspec ...")
-        minetest.log("action", dump2("FORMSPEC: ", formspec))
         meta:set_string("formspec", formspec)
     end
 
@@ -80,7 +78,6 @@ Barrel.new = function (pos)
         setInventory("src", 1)
         setInventory("dst", 1)
         setInventory("buk", 1)
-        minetest.log("action", "initialized!")
         self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
         meta:set_int("initialized", 1)
     end

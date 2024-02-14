@@ -2,7 +2,6 @@ local modname = minetest.get_current_modname()
 local Barrel = dofile(minetest.get_modpath(modname) .. "/mod_files/barrel.lua")
 
 function onConstruct (pos)
-    minetest.log("action", "creating barrel ...")
     local barrel = Barrel.new(pos)
 end
 

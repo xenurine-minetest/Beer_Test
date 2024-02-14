@@ -50,8 +50,8 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/growing_rope.lua")
 print("Beer_test: Loading 'malting.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/malting.lua")
 
-print("Beer_test: Loading 'barrel.lua'")
-dofile(minetest.get_modpath("beer_test").."/mod_files/barrel.lua")
+print("Beer_test: Loading 'barrel_node.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/barrel_node.lua")
 
 
 
