@@ -8,9 +8,7 @@ The Mod Which Adds Beer To Minetest
 
 Ever wanted to make and Drink your own beer. This mod adds some plants into mine test as well as adding the stages of making beer, as well as not forgetting the beer itself. We are planning on adding a lot more to this mod such as more beers, ales and even cider. Stay tune for new updates which are coming soon. 
 
-Current version 1.2
-
-Stable Version 1.2.3 
+Stable Version 1.3.0
 
 ### How To Install ###
 
