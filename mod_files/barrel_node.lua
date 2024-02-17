@@ -18,6 +18,9 @@ local function onTimer (pos, time)
             barrel.ferment()
         end
     ]]--
+    if (soaked) then
+        minetest.get_node_timer(pos):start(1.0)
+    end
 end
 
 local function canDig (pos, player, node)
@@ -34,6 +37,7 @@ local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
         if (itemStack:get_name() == "bucket:bucket_water") then
             minetest.log("action", "filling barrel ... overflow: " .. barrel.fillLiquid(1, 'water'))
             minetest.log("action", "barrel state: " .. barrel.getLiquidStatus())
+            minetest.get_node_timer(pos):start(1.0)
         elseif (itemStack:get_name() == "bucket:bucket_empty") then
             minetest.log("action", "taking from barrel ... return: "..barrel.takeLiquid(1))
             minetest.log("action", "barrel state: " .. barrel.getLiquidStatus())
