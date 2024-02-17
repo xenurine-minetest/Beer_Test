@@ -126,7 +126,7 @@ Barrel.new = function (pos)
 
     -- private methods
     setInventory = function (name, size)
-        inventory:set_size(name, 1)
+        inventory:set_size(name, size)
     end
 
     initialize = function ()
