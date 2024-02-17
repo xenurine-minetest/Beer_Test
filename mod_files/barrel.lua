@@ -66,7 +66,11 @@ Barrel.new = function (pos)
             local bucket_stack = inventory:get_stack('liquid', 1)
             bucket_stack:add_item("bucket:bucket_empty")
             inventory:set_stack('liquid', 1, bucket_stack)
+
+            return true
         end
+
+        return false
     end
 
     self.allInventoriesEmpty = function ()
@@ -85,8 +89,8 @@ Barrel.new = function (pos)
         end
         
         if (fillAmount + liquidLevel > liquidLevelLimit) then
-            local oldLiquidLevel = liquidlevel
-            liquidlevel = liquidLevelLimit
+            local oldLiquidLevel = liquidLevel
+            liquidLevel = liquidLevelLimit
             return fillAmount + oldLiquidLevel - liquidLevelLimit
         end
 
@@ -106,13 +110,17 @@ Barrel.new = function (pos)
             return oldLiquidLevel, oldLiquidType
         end
 
-        liquidLevel = liquidlevel - amount
+        liquidLevel = liquidLevel - amount
 
         if (liquidLevel == 0) then
             liquidType = nil
         end 
-
+        
         return amount, oldLiquidType
+    end
+
+    self.getLiquidStatus = function ()
+        return liquidLevel
     end
 
 
