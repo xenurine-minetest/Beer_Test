@@ -37,6 +37,8 @@ Barrel.new = function (pos)
        return inventory:get_list("dst")
     end
 
+    ---returns if barrel has items in source inventory that got soaking craft recipe
+    ---@return boolean
     self.hasSoakingItems = function ()
         local soakingItemStack = getSoakingItemStack()
         if (soakingItemStack ~= nil) then
@@ -46,6 +48,8 @@ Barrel.new = function (pos)
         return false
     end
 
+    ---runs soak craft recipes for all soakable items if available
+    ---@return boolean
     self.soak = function ()
         local soakingItemStack, soakingItemStackIndex = getSoakingItemStack()
         local takenSoakingItem = soakingItemStack:take_item(1)
@@ -73,13 +77,18 @@ Barrel.new = function (pos)
         return false
     end
 
+    ---checks if all inventories are empty
+    ---@return boolean
     self.allInventoriesEmpty = function ()
         return inventory:is_empty("src") and inventory:is_empty("dst") and inventory:is_empty("liquid") and inventory:is_empty("buk")
     end
 
+    ---fill barrel with liquid
+    ---returns overflow
+    ---@param fillAmount
+    ---@param fillType string
+    ---@return number "overflow"
     self.fillLiquid = function (fillAmount, fillType)
-        fillAmount = toNumber(fillAmount)
-
         if (liquidType ~= nil and liquidType ~= fillType) then
             return fillAmount
         end
@@ -99,8 +108,11 @@ Barrel.new = function (pos)
         return 0
     end
 
+    ---takes liquid from barrel, returns actually retrieved amount and liquid type
+    ---@param amount number
+    ---@return number "amount"
+    ---@return string|nil "liquid type"
     self.takeLiquid = function (amount)
-        amount = toNumber(amount)
         local oldLiquidType = liquidType
 
         if (liquidLevel < amount) then 
