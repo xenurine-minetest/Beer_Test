@@ -30,10 +30,6 @@ Barrel.new = function (pos)
         return meta:get_string("formSpec")
     end
 
-    self.getLiquidStack = function ()
-        return inventory:get_list("liquid")[1]
-    end
-
     self.getSourceInventory = function ()
         return inventory:get_list("src")
     end
@@ -59,22 +55,17 @@ Barrel.new = function (pos)
         local soakingItemStack, soakingItemStackIndex = getSoakingItemStack()
         local takenSoakingItem = soakingItemStack:take_item(1)
 
-        local liquidStack = self.getLiquidStack()
-        local takenLiquidItem = liquidStack:take_item(1)
+        local liquidLevel, liquidType = self.getLiquidStatus()
 
-        if (takenSoakingItem:get_count() > 0 and takenLiquidItem:get_count() > 0) then
+        if (takenSoakingItem:get_count() > 0 and liquidType == "water" and liquidLevel > 0) then
             inventory:set_stack("src", soakingItemStackIndex, soakingItemStack)
-            inventory:set_stack("liquid", 1, liquidStack)
+            self.takeLiquid(1)
 
             local dst_stack = inventory:get_stack('dst', 1)
             dst_stack:add_item(
                 beer_test.soakRecipeHandler.getDestinationForSource(takenSoakingItem:get_name())
             )
             inventory:set_stack('dst', 1, dst_stack)
-         
-            local bucket_stack = inventory:get_stack('liquid', 1)
-            bucket_stack:add_item("bucket:bucket_empty")
-            inventory:set_stack('liquid', 1, bucket_stack)
 
             return true
         end
@@ -98,8 +89,8 @@ Barrel.new = function (pos)
         local liquidLevel = getLiquidLevel()
         local liquidLevelLimit = getLiquidLevelLimit()
 
+        --reject if liquidType doesn't match
         if (liquidType ~= "" and liquidType ~= fillType) then
-            minetest.log("action", "type of liquid: " ..liquidType)
             return fillAmount
         end
 
@@ -153,7 +144,7 @@ Barrel.new = function (pos)
     initialize = function ()
         setInventory("src", 1)
         setInventory("dst", 1)
-        setLiquidLevel(1)
+        setLiquidLevel(0)
         setLiquidLevelLimit(10)
         setLiquidType("water")
         --self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
@@ -199,7 +190,11 @@ Barrel.new = function (pos)
     end
 
     updateFormSpec = function()
-        self.setFormSpec(Barrel.formspecs.default("Filled Barrel", getLiquidLevel()/getLiquidLevelLimit()*100))
+        self.setFormSpec(Barrel.formspecs.default(
+                "Filled Barrel",
+                getLiquidLevel()/getLiquidLevelLimit()*100,
+                "nodemeta:"..pos.x..","..pos.y..","..pos.z
+        ))
     end
 
     construct()
@@ -207,7 +202,7 @@ Barrel.new = function (pos)
 end
 
 Barrel.formspecs = {
-    default = function (infoText, fillState)
+    default = function (infoText, fillState, nodePosition)
         if (type(fillState) ~= "number") then
             return
         end
@@ -230,9 +225,9 @@ Barrel.formspecs = {
             "label[0.375,0.5;"..infoText.."]",
             "image[2,1;1,3;gui_barrel_bar.png]",
             "image[2,"..y..";1,"..height..";gui_barrel_bar_fg.png]",
-            "list[context;src;4,3;1,1;]",
+            "list["..nodePosition..";src;4,3;1,1;]",
             "image[5.3,3;1,1;gui_barrel_arrow_bg.png]",
-            "list[context;dst;6.5,3;1,1;]",
+            "list["..nodePosition..";dst;6.5,3;1,1;]",
             "button[5,1.2;2,0.5;test;Seal Barrel]",
             "list[current_player;main;0.3,4.5;8,4;]",
             --default.get_hotbar_bg(0, 4.5)
