@@ -1,12 +1,13 @@
 local Barrel = {}
 
-Barrel.new = function (pos) 
+Barrel.new = function (pos)
+    ---@class Barrel
     local self = {}
     -- private property declarations
-    local meta, inventory, getSoakingItemStack, liquidLevel, liquidLevelLimit, liquidType
+    local meta, inventory, getSoakingItemStack
 
     -- private method declarations
-    local initialize,setInventory
+    local initialize,setInventory, getLiquidLevel, setLiquidLevel, getLiquidLevelLimit, setLiquidLevelLimit, getLiquidType, setLiquidType, updateFormSpec
 
 
     -- constructor
@@ -21,8 +22,12 @@ Barrel.new = function (pos)
 
 
     -- public methods
-    self.setFormSpec = function(formspec)
-        meta:set_string("formspec", formspec)
+    self.setFormSpec = function(setFormSpec)
+        meta:set_string("formSpec", setFormSpec)
+    end
+
+    self.getFormSpec = function ()
+        return meta:get_string("formSpec")
     end
 
     self.getLiquidStack = function ()
@@ -89,21 +94,25 @@ Barrel.new = function (pos)
     ---@param fillType string
     ---@return number "overflow"
     self.fillLiquid = function (fillAmount, fillType)
-        if (liquidType ~= nil and liquidType ~= fillType) then
+        local liquidType = getLiquidType()
+        local liquidLevel = getLiquidLevel()
+        local liquidLevelLimit = getLiquidLevelLimit()
+
+        if (liquidType ~= "" and liquidType ~= fillType) then
+            minetest.log("action", "type of liquid: " ..liquidType)
             return fillAmount
         end
 
-        if (liquidType == nil and liquidLevel == 0) then
-            liquidType = fillType
+        if (liquidType == "" and liquidLevel == 0) then
+            setLiquidType(fillType)
         end
         
         if (fillAmount + liquidLevel > liquidLevelLimit) then
-            local oldLiquidLevel = liquidLevel
-            liquidLevel = liquidLevelLimit
-            return fillAmount + oldLiquidLevel - liquidLevelLimit
+            setLiquidLevel(liquidLevelLimit)
+            return fillAmount + liquidLevel - liquidLevelLimit
         end
 
-        liquidLevel = liquidLevel + fillAmount
+        setLiquidLevel(liquidLevel + fillAmount)
 
         return 0
     end
@@ -113,28 +122,28 @@ Barrel.new = function (pos)
     ---@return number "amount"
     ---@return string|nil "liquid type"
     self.takeLiquid = function (amount)
-        local oldLiquidType = liquidType
+        local liquidType = getLiquidType()
+        local liquidLevel = getLiquidLevel()
 
-        if (liquidLevel < amount) then 
-            local oldLiquidLevel = liquidLevel
-            liquidLevel = 0
-            liquidType = nil
-            return oldLiquidLevel, oldLiquidType
+        if (liquidLevel < amount) then
+            setLiquidLevel(0)
+            setLiquidType(nil)
+            return liquidLevel, liquidType
         end
 
         liquidLevel = liquidLevel - amount
+        setLiquidLevel(liquidLevel)
 
         if (liquidLevel == 0) then
-            liquidType = nil
+            setLiquidType(nil)
         end 
         
-        return amount, oldLiquidType
+        return amount, getLiquidType()
     end
 
     self.getLiquidStatus = function ()
-        return liquidLevel
+        return getLiquidLevel(), getLiquidType()
     end
-
 
     -- private methods
     setInventory = function (name, size)
@@ -142,15 +151,40 @@ Barrel.new = function (pos)
     end
 
     initialize = function ()
-        setInventory("liquid", 1)
         setInventory("src", 1)
         setInventory("dst", 1)
-        setInventory("buk", 1)
-        liquidLevel = 0
-        liquidLevelLimit = 500
-        liquidType = nil
-        self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
+        setLiquidLevel(1)
+        setLiquidLevelLimit(10)
+        setLiquidType("water")
+        --self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
+        updateFormSpec()
         meta:set_int("initialized", 1)
+    end
+
+    getLiquidLevel = function ()
+        return meta:get_int("liquidLevel")
+    end
+
+    setLiquidLevel = function (liquidLevel)
+        meta:set_int("liquidLevel", liquidLevel)
+        updateFormSpec()
+    end
+
+    getLiquidLevelLimit = function ()
+        return meta:get_int("liquidLevelLimit")
+    end
+
+    setLiquidLevelLimit = function (liquidLevelLimit)
+        meta:set_int("liquidLevelLimit", liquidLevelLimit)
+        updateFormSpec()
+    end
+
+    getLiquidType = function()
+        return meta:get_string("liquidType")
+    end
+
+    setLiquidType = function(liquidType)
+        meta:set_string("liquidType", liquidType)
     end
 
     getSoakingItemStack = function ()
@@ -164,24 +198,44 @@ Barrel.new = function (pos)
         return nil
     end
 
+    updateFormSpec = function()
+        self.setFormSpec(Barrel.formspecs.default("Filled Barrel", getLiquidLevel()/getLiquidLevelLimit()*100))
+    end
+
     construct()
     return self;
 end
 
 Barrel.formspecs = {
-    default = function (infotext)
+    default = function (infoText, fillState)
+        if (type(fillState) ~= "number") then
+            return
+        end
+        if (fillState < 0 or fillState >100) then
+            infoText = "Fill state of barrel MUST be between 0 and 100"
+            return table.concat({
+                "size[8,8.5]",
+                "label[0,0.0;"..infoText.."]",
+            }, "")
+        end
+
+        local height = 3/100*fillState
+        local y = 3 - height +1
+
         return table.concat({
-            "size[8,8.5]",
-            "label[0,0.0;"..infotext.."]",
-            "image[2,1;1,3.35;gui_barrel_bar.png]",
-            "list[context;liquid;3,1;1,1;]",
-            "list[context;src;3,3;1,1;]",
-            "image[4,3;1,1;gui_barrel_arrow_bg.png]",
-            "list[context;dst;5,3;1,1;]",
-            "list[context;buk;6,3;1,1;]",
+            "formspec_version[6]",
+            "size[11,10]",
+            "position[0.5,0.5]",
+            "padding[0.1,0.1]",
+            "label[0.375,0.5;"..infoText.."]",
+            "image[2,1;1,3;gui_barrel_bar.png]",
+            "image[2,"..y..";1,"..height..";gui_barrel_bar_fg.png]",
+            "list[context;src;4,3;1,1;]",
+            "image[5.3,3;1,1;gui_barrel_arrow_bg.png]",
+            "list[context;dst;6.5,3;1,1;]",
             "button[5,1.2;2,0.5;test;Seal Barrel]",
-            "list[current_player;main;0,4.5;8,4;]",
-            default.get_hotbar_bg(0, 4.5)
+            "list[current_player;main;0.3,4.5;8,4;]",
+            --default.get_hotbar_bg(0, 4.5)
         }, "")
     end, 
     soaking = function ()
