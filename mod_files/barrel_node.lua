@@ -1,5 +1,7 @@
 local modname = minetest.get_current_modname()
 local Barrel = dofile(minetest.get_modpath(modname) .. "/mod_files/barrel.lua")
+---@type RefreshingFormSpecs
+local formSpec = dofile(minetest.get_modpath(modname) .. "/mod_files/formspec.lua")
 
 local function onConstruct (pos)
     Barrel.new(pos)
@@ -31,7 +33,7 @@ end
 
 local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
     ---@type Barrel
-    local barrel = Barrel.new(pos)
+    local barrel = Barrel.new(pos, clicker)
 
     if (clicker:is_player()) then
         if (itemStack:get_name() == "bucket:bucket_water") then
@@ -42,7 +44,8 @@ local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
             minetest.log("action", "taking from barrel ... return: "..barrel.takeLiquid(1))
             minetest.log("action", "barrel state: " .. barrel.getLiquidStatus())
         else
-            minetest.show_formspec(clicker:get_player_name(), "guessing:game", barrel.getFormSpec())
+            minetest.log("action", dump2(barrel.getFormSpec(), "formSpecObject"))
+            formSpec.open(barrel,"beer_test:barrel", clicker:get_player_name())
         end
     end
 end
