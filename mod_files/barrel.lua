@@ -193,8 +193,7 @@ Barrel.new = function (pos)
 
     updateFormSpec = function()
         self.setFormSpec(Barrel.formspecs.default(
-                "Filled Barrel",
-                getLiquidLevel()/getLiquidLevelLimit()*100,
+                {level = getLiquidLevel(), limit = getLiquidLevelLimit(), type = getLiquidType()},
                 "nodemeta:"..pos.x..","..pos.y..","..pos.z
         ))
     end
@@ -232,20 +231,30 @@ Barrel.new = function (pos)
 end
 
 Barrel.formspecs = {
-    default = function (infoText, fillState, nodePosition)
-        if (type(fillState) ~= "number") then
-            return
-        end
-        if (fillState < 0 or fillState >100) then
-            infoText = "Fill state of barrel MUST be between 0 and 100"
-            return table.concat({
-                "size[8,8.5]",
-                "label[0,0.0;"..infoText.."]",
-            }, "")
+    default = function (liquidData, nodePosition)
+        local fillStateInPercent = liquidData.level/liquidData.limit*100
+        local infoText = ""
+
+        if (liquidData.type == "") then
+            infoText = "Empty Barrel"
+        else
+            infoText = "Barrel filled with " .. liquidData.type .. " "
+                    .. liquidData.level .. "L / " .. " " .. liquidData.limit .. "L"
         end
 
-        local height = 3/100*fillState
-        local y = 3 - height +1
+        local function verticalBar (x, y, width, height, percent)
+            local backGround = "image["..x..","..y..";"..width..","..height..";gui_barrel_bar.png]"
+            local foreground = ""
+
+            if (percent > 0 ) then
+                local heightP = height/100*percent
+                local yP = height - heightP +y
+
+                foreground = "image["..x..","..yP..";"..width..","..heightP..";gui_barrel_bar_fg.png]"
+            end
+
+            return backGround .. foreground
+        end
 
         return table.concat({
             "formspec_version[6]",
@@ -253,11 +262,10 @@ Barrel.formspecs = {
             "position[0.5,0.5]",
             "padding[0.1,0.1]",
             "label[0.375,0.5;"..infoText.."]",
-            "image[2,1;1,3;gui_barrel_bar.png]",
-            "image[2,"..y..";1,"..height..";gui_barrel_bar_fg.png]",
-            "list["..nodePosition..";src;4,3;1,1;]",
+            verticalBar(1.55, 1, 1, 3, fillStateInPercent),
+            "list["..nodePosition..";src;4.05,3;1,1;]",
             "image[5.3,3;1,1;gui_barrel_arrow_bg.png]",
-            "list["..nodePosition..";dst;6.5,3;1,1;]",
+            "list["..nodePosition..";dst;6.55,3;1,1;]",
             "button[5,1.2;2,0.5;test;Seal Barrel]",
             "list[current_player;main;0.3,4.5;8,4;]",
             --default.get_hotbar_bg(0, 4.5)
