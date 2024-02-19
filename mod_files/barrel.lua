@@ -7,7 +7,9 @@ Barrel.new = function (pos)
     local meta, inventory, getSoakingItemStack
 
     -- private method declarations
-    local initialize,setInventory, getLiquidLevel, setLiquidLevel, getLiquidLevelLimit, setLiquidLevelLimit, getLiquidType, setLiquidType, updateFormSpec
+    local initialize,setInventory, getLiquidLevel, setLiquidLevel,
+    getLiquidLevelLimit, setLiquidLevelLimit, getLiquidType, setLiquidType, updateFormSpec,
+    updateInfo
 
 
     -- constructor
@@ -146,9 +148,8 @@ Barrel.new = function (pos)
         setInventory("dst", 1)
         setLiquidLevel(0)
         setLiquidLevelLimit(10)
-        setLiquidType("water")
-        --self.setFormSpec(Barrel.formspecs.default("Empty Barrel"))
-        updateFormSpec()
+        setLiquidType(nil)
+        self.updateDisplay()
         meta:set_int("initialized", 1)
     end
 
@@ -158,7 +159,7 @@ Barrel.new = function (pos)
 
     setLiquidLevel = function (liquidLevel)
         meta:set_int("liquidLevel", liquidLevel)
-        updateFormSpec()
+        self.updateDisplay()
     end
 
     getLiquidLevelLimit = function ()
@@ -167,7 +168,7 @@ Barrel.new = function (pos)
 
     setLiquidLevelLimit = function (liquidLevelLimit)
         meta:set_int("liquidLevelLimit", liquidLevelLimit)
-        updateFormSpec()
+        self.updateDisplay()
     end
 
     getLiquidType = function()
@@ -176,6 +177,7 @@ Barrel.new = function (pos)
 
     setLiquidType = function(liquidType)
         meta:set_string("liquidType", liquidType)
+        self.updateDisplay()
     end
 
     getSoakingItemStack = function ()
@@ -195,6 +197,34 @@ Barrel.new = function (pos)
                 getLiquidLevel()/getLiquidLevelLimit()*100,
                 "nodemeta:"..pos.x..","..pos.y..","..pos.z
         ))
+    end
+
+    updateInfo = function()
+        local infoText = ""
+        local liquidType = getLiquidType()
+
+        if(liquidType == "" and inventory:is_empty("src")) then
+            infoText = "Empty Barrel"
+        else
+            infoText = "Barrel contains "
+            local itemName = inventory:get_list("src")[1]:get_name()
+            if (itemName ~= "") then
+                local itemDescription = minetest.registered_nodes[itemName]['description']
+                infoText = infoText .. itemDescription
+            end
+
+            if (liquidType ~= "") then
+                if (itemName ~= "") then infoText = infoText .. " and " end
+                infoText = infoText .. liquidType .. " " .. getLiquidLevel() .. "L / " .. getLiquidLevelLimit() .. "L"
+            end
+        end
+
+        meta:set_string("infotext", infoText)
+    end
+
+    self.updateDisplay = function()
+        updateFormSpec()
+        updateInfo()
     end
 
     construct()
