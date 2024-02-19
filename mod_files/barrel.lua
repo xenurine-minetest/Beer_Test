@@ -76,7 +76,7 @@ Barrel.new = function (pos)
     ---checks if all inventories are empty
     ---@return boolean
     self.allInventoriesEmpty = function ()
-        return inventory:is_empty("src") and inventory:is_empty("dst") and inventory:is_empty("liquid") and inventory:is_empty("buk")
+        return inventory:is_empty("src") and inventory:is_empty("dst")
     end
 
     ---fill barrel with liquid
