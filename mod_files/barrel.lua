@@ -1,16 +1,15 @@
+local LiquidContainer = dofile(minetest.get_modpath("beer_test").."/mod_files/abstract_liquid_container.lua")
 local Barrel = {}
 
 Barrel.new = function (pos)
-    ---@class Barrel
-    local self = {}
+    ---@type LiquidContainer
+    local self = LiquidContainer.new(pos)
+
     -- private property declarations
     local meta, inventory, getSoakingItemStack
 
     -- private method declarations
-    local initialize,setInventory, getLiquidLevel, setLiquidLevel,
-    getLiquidLevelLimit, setLiquidLevelLimit, getLiquidType, setLiquidType, updateFormSpec,
-    updateInfo
-
+    local initialize, setInventory, updateFormSpec, updateInfo
 
     -- constructor
     local construct = function ()
@@ -21,7 +20,6 @@ Barrel.new = function (pos)
             initialize()
         end
     end
-
 
     -- public methods
     self.setFormSpec = function(setFormSpec)
@@ -81,63 +79,6 @@ Barrel.new = function (pos)
         return inventory:is_empty("src") and inventory:is_empty("dst")
     end
 
-    ---fill barrel with liquid
-    ---returns overflow
-    ---@param fillAmount
-    ---@param fillType string
-    ---@return number "overflow"
-    self.fillLiquid = function (fillAmount, fillType)
-        local liquidType = getLiquidType()
-        local liquidLevel = getLiquidLevel()
-        local liquidLevelLimit = getLiquidLevelLimit()
-
-        --reject if liquidType doesn't match
-        if (liquidType ~= "" and liquidType ~= fillType) then
-            return fillAmount
-        end
-
-        if (liquidType == "" and liquidLevel == 0) then
-            setLiquidType(fillType)
-        end
-        
-        if (fillAmount + liquidLevel > liquidLevelLimit) then
-            setLiquidLevel(liquidLevelLimit)
-            return fillAmount + liquidLevel - liquidLevelLimit
-        end
-
-        setLiquidLevel(liquidLevel + fillAmount)
-
-        return 0
-    end
-
-    ---takes liquid from barrel, returns actually retrieved amount and liquid type
-    ---@param amount number
-    ---@return number "amount"
-    ---@return string|nil "liquid type"
-    self.takeLiquid = function (amount)
-        local liquidType = getLiquidType()
-        local liquidLevel = getLiquidLevel()
-
-        if (liquidLevel < amount) then
-            setLiquidLevel(0)
-            setLiquidType(nil)
-            return liquidLevel, liquidType
-        end
-
-        liquidLevel = liquidLevel - amount
-        setLiquidLevel(liquidLevel)
-
-        if (liquidLevel == 0) then
-            setLiquidType(nil)
-        end 
-        
-        return amount, getLiquidType()
-    end
-
-    self.getLiquidStatus = function ()
-        return getLiquidLevel(), getLiquidType()
-    end
-
     -- private methods
     setInventory = function (name, size)
         inventory:set_size(name, size)
@@ -146,38 +87,8 @@ Barrel.new = function (pos)
     initialize = function ()
         setInventory("src", 1)
         setInventory("dst", 1)
-        setLiquidLevel(0)
-        setLiquidLevelLimit(10)
-        setLiquidType(nil)
         self.updateDisplay()
         meta:set_int("initialized", 1)
-    end
-
-    getLiquidLevel = function ()
-        return meta:get_int("liquidLevel")
-    end
-
-    setLiquidLevel = function (liquidLevel)
-        meta:set_int("liquidLevel", liquidLevel)
-        self.updateDisplay()
-    end
-
-    getLiquidLevelLimit = function ()
-        return meta:get_int("liquidLevelLimit")
-    end
-
-    setLiquidLevelLimit = function (liquidLevelLimit)
-        meta:set_int("liquidLevelLimit", liquidLevelLimit)
-        self.updateDisplay()
-    end
-
-    getLiquidType = function()
-        return meta:get_string("liquidType")
-    end
-
-    setLiquidType = function(liquidType)
-        meta:set_string("liquidType", liquidType)
-        self.updateDisplay()
     end
 
     getSoakingItemStack = function ()
@@ -193,14 +104,14 @@ Barrel.new = function (pos)
 
     updateFormSpec = function()
         self.setFormSpec(Barrel.formspecs.default(
-                {level = getLiquidLevel(), limit = getLiquidLevelLimit(), type = getLiquidType()},
+                {level = self.getLiquidLevel(), limit = self.getLiquidLevelLimit(), type = self.getLiquidType()},
                 "nodemeta:"..pos.x..","..pos.y..","..pos.z
         ))
     end
 
     updateInfo = function()
         local infoText = ""
-        local liquidType = getLiquidType()
+        local liquidType = self.getLiquidType()
 
         if(liquidType == "" and inventory:is_empty("src")) then
             infoText = "Empty Barrel"
@@ -208,13 +119,23 @@ Barrel.new = function (pos)
             infoText = "Barrel contains "
             local itemName = inventory:get_list("src")[1]:get_name()
             if (itemName ~= "") then
-                local itemDescription = minetest.registered_nodes[itemName]['description']
+                local itemDescription
+                if (minetest.registered_nodes[itemName] ~= nil) then
+                    itemDescription = minetest.registered_nodes[itemName]['description']
+                elseif (minetest.registered_items[itemName] ~= nil) then
+                    itemDescription = minetest.registered_items[itemName]['description']
+                elseif (minetest.registered_craftitems[itemName] ~= nil) then
+                    itemDescription = minetest.registered_craftitems[itemName]['description']
+                else
+                    itemDescription = itemName
+                end
+
                 infoText = infoText .. itemDescription
             end
 
             if (liquidType ~= "") then
                 if (itemName ~= "") then infoText = infoText .. " and " end
-                infoText = infoText .. liquidType .. " " .. getLiquidLevel() .. "L / " .. getLiquidLevelLimit() .. "L"
+                infoText = infoText .. liquidType .. " " .. self.getLiquidLevel() .. "L / " .. self.getLiquidLevelLimit() .. "L"
             end
         end
 
