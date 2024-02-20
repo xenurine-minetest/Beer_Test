@@ -33,65 +33,8 @@
 -- crafts wheat tray --
 
 
- minetest.register_craft({
-	output = "beer_test:tray",
-	recipe = {
-		{"default:stick","", "default:stick"},
-		{"default:wood","default:wood", "default:wood"},
-	}
-})
+-- removed see malting.lua
 
-
- minetest.register_craft({
-	output = "beer_test:wheat_tray",
-	recipe = {
-		{"farming:wheat","farming:wheat", "farming:wheat"},
-		{"farming:wheat","farming:wheat", "farming:wheat"},
-		{"","beer_test:tray", ""},
-	}
-})
-
- minetest.register_craft({
-	output = "beer_test:wheat_tray",
-	recipe = {
-		{"farming:wheat","farming:wheat", "farming:wheat"},
-		{"farming:wheat","farming:wheat", "farming:wheat"},
-		{"default:wood","default:wood", "default:wood"},
-	}
-})
-
-
-
--- malt grain crafts -- 
-
- minetest.register_craft({
-	type = "shapeless",
-	output = "beer_test:malt_grain_malt",
-	recipe = {"beer_test:malt_tray_malt"},
-	replacements = {
-	{"beer_test:malt_tray_malt", "beer_test:tray"}
-   }
-})
-
-
- minetest.register_craft({
-	type = "shapeless",
-	output = "beer_test:malt_grain_crystalised_malt",
-	recipe = {"beer_test:malt_tray_crystalised_malt"},
-	replacements = {
-		{"beer_test:malt_tray_crystalised_malt", "beer_test:tray"}
-	}
-})
-
-
- minetest.register_craft({
-	type = "shapeless",
-	output = "beer_test:malt_grain_black_malt",
-	recipe = {"beer_test:malt_tray_black_malt"},
-	replacements = {
-		{"beer_test:malt_tray_black_malt", "beer_test:tray"}
-	}
-})
 
 -- crafts for plant stuff --
 
@@ -130,21 +73,14 @@
 	}
 })
 
--- craft for crops --
 
-minetest.register_craft({
-	output = "beer_test:crop 2",
-	recipe = {
-		{"default:stick","", "default:stick"},
-		{"default:stick","", "default:stick"},
-	}
-})
 
 -----------------
 -- beer crafts --
 -----------------
 
 -- beer grains --
+--[[
 
 minetest.register_craft({
 	output = "beer_test:mixed_beer_grain",
@@ -182,7 +118,7 @@ minetest.register_craft({
 	recipe = {"beer_test:mixed_mead_grain","beer_test:barrel"},
 })
 
-
+]]--
 
 
 
@@ -191,33 +127,23 @@ minetest.register_craft({
 -------------
 minetest.register_craft({
 	type = "cooking",
-	output = "beer_test:malt_tray_malt",
-	recipe = "beer_test:sprouting_tray_2",
+	output = "beer_test:malt_light_malt",
+	recipe = "beer_test:sprouting_barley",
 })
 
 minetest.register_craft({
 	type = "cooking",
-	output = "beer_test:malt_tray_malt",
-	recipe = "beer_test:sprouting_tray",
+	output = "beer_test:malt_brown_malt",
+	recipe = "beer_test:malt_light_malt",
 })
 
 minetest.register_craft({
 	type = "cooking",
-	output = "beer_test:yeast",
-	recipe = "farming:wheat",
+	output = "beer_test:malt_black_malt",
+	recipe = "beer_test:malt_brown_malt",
 })
 
-minetest.register_craft({
-	type = "cooking",
-	output = "beer_test:malt_tray_crystalised_malt",
-	recipe = "beer_test:malt_tray_malt",
-})
 
-minetest.register_craft({
-	type = "cooking",
-	output = "beer_test:malt_tray_black_malt",
-	recipe = "beer_test:malt_tray_crystalised_malt",
-})
 
 minetest.register_craft({
 	type = "cooking",
