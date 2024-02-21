@@ -27,7 +27,15 @@ BeerTest.soakRecipeHandler = function ()
     end
 
     self.registerSoakRecipe = function (sourceNode, destNode)
-        -- TODO: check if nodes are registered in minetest
+        if (minetest.registered_craftitems[sourceNode == nil]) then 
+            minetest.log("error", sourceNode + " doesn't exist!")
+            return false
+        end
+
+        if (minetest.registered_craftitems[destNode == nil] and minetest.registered_nodes[destNode == nil]) then 
+            minetest.log("error", destNode + " doesn't exist!")
+            return false
+        end
 
         if (self.isSoakSource(sourceNode)) then
             minetest.log("error", "Recipe for node " + sourceNode + " is already registered")
@@ -38,6 +46,8 @@ BeerTest.soakRecipeHandler = function ()
             sourceNode = sourceNode,
             destNode = destNode
         })
+
+        return true
     end
 
 
