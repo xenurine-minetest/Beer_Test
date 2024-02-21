@@ -23,6 +23,7 @@ local function onTimer (pos, time)
     if (soaked) then
         minetest.get_node_timer(pos):start(1.0)
     end
+    barrel.updateDisplay()
 end
 
 local function canDig (pos, player, node)
@@ -37,14 +38,11 @@ local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
 
     if (clicker:is_player()) then
         if (itemStack:get_name() == "bucket:bucket_water") then
-            minetest.log("action", "filling barrel ... overflow: " .. barrel.fillLiquid(1, 'water'))
-            minetest.log("action", "barrel state: " .. barrel.getLiquidStatus())
+            barrel.fillLiquid(1, 'water')
             minetest.get_node_timer(pos):start(1.0)
         elseif (itemStack:get_name() == "bucket:bucket_empty") then
-            minetest.log("action", "taking from barrel ... return: "..barrel.takeLiquid(1))
-            minetest.log("action", "barrel state: " .. barrel.getLiquidStatus())
+            barrel.takeLiquid(1)
         else
-            minetest.log("action", dump2(barrel.getFormSpec(), "formSpecObject"))
             formSpec.open(barrel,"beer_test:barrel", clicker:get_player_name())
         end
     end
