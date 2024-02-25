@@ -29,8 +29,13 @@ AbstractLiquidContainer.new = function (pos, environment)
         local oldTemperature = self.getTemperature()
 
         local transmittedEnergy = getTransmittedEnergy()
+        local liquidLevel = self.getLiquidLevel()
 
-        local addedTemperature = transmittedEnergy/(4190*self.getLiquidLevel())
+        if (liquidLevel == 0) then
+            return false
+        end
+
+        local addedTemperature = transmittedEnergy/(4190*liquidLevel)
 
         if (addedTemperature == 1/0 or addedTemperature == 1/-0) then
             addedTemperature = 0
