@@ -53,6 +53,9 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/malting.lua")
 print("Beer_test: Loading 'barrel_node.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/barrel_node.lua")
 
+print("Beer_test: Loading 'cauldron_node.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/cauldron_node.lua")
+
 print("Beer_test: Loading 'global_handlers.lua'")
 beer_test = dofile(minetest.get_modpath("beer_test").."/mod_files/global_handlers.lua")
 

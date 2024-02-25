@@ -1,9 +1,9 @@
 local LiquidContainer = dofile(minetest.get_modpath("beer_test").."/mod_files/abstract_liquid_container.lua")
 local Barrel = {}
 
-Barrel.new = function (pos)
-    ---@type LiquidContainer
-    local self = LiquidContainer.new(pos)
+Barrel.new = function (pos, environment)
+    ---@class Barrel :LiquidContainer
+    local self = LiquidContainer.new(pos, environment)
 
     -- private property declarations
     local meta, inventory, getSoakingItemStack

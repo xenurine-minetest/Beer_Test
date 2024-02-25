@@ -1,51 +1,54 @@
 local modname = minetest.get_current_modname()
 local Barrel = dofile(minetest.get_modpath(modname) .. "/mod_files/barrel.lua")
+local Environment = dofile(minetest.get_modpath(modname) .. "/mod_files/environment.lua")
+
 ---@type RefreshingFormSpecs
 local formSpec = dofile(minetest.get_modpath(modname) .. "/mod_files/formspec.lua")
 
 local function onConstruct (pos)
-    Barrel.new(pos)
+    Barrel.new(pos, Environment.new(pos))
 end
 
 local function onTimer (pos, time)
     ---@type Barrel
-    local barrel = Barrel.new(pos)
+    local barrel = Barrel.new(pos, Environment.new(pos))
+
+    local heated = barrel.heat()
     local soaked = false
 
     if (barrel.hasSoakingItems()) then
         soaked = barrel.soak()
     end
-    --[[
-        if (barrel.isSealed()) then
-            barrel.ferment()
-        end
-    ]]--
-    if (soaked) then
-        minetest.get_node_timer(pos):start(1.0)
-    end
     barrel.updateDisplay()
+
+    if (soaked or heated) then
+        return true
+    end
 end
 
 local function canDig (pos, player, node)
     ---@type Barrel
-    local barrel = Barrel.new(pos)
-	return barrel.allInventoriesEmpty()
+    local barrel = Barrel.new(pos, Environment.new(pos))
+	return barrel.allInventoriesEmpty() and barrel.getLiquidLevel() == 0
 end
 
 local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
-    ---@type Barrel
-    local barrel = Barrel.new(pos, clicker)
-
-    if (clicker:is_player()) then
-        if (itemStack:get_name() == "bucket:bucket_water") then
-            barrel.fillLiquid(1, 'water')
-            minetest.get_node_timer(pos):start(1.0)
-        elseif (itemStack:get_name() == "bucket:bucket_empty") then
-            barrel.takeLiquid(1)
-        else
-            formSpec.open(barrel,"beer_test:barrel", clicker:get_player_name())
-        end
+    if (not clicker:is_player()) then
+        return
     end
+
+    ---@type Barrel
+    local barrel = Barrel.new(pos, Environment.new(pos))
+
+    if (itemStack:get_name() == "bucket:bucket_water") then
+        barrel.fillLiquid(1, 'water', 20)
+    elseif (itemStack:get_name() == "bucket:bucket_empty") then
+        barrel.takeLiquid(1)
+    else
+        formSpec.open(barrel,"beer_test:barrel", clicker:get_player_name())
+    end
+
+    minetest.get_node_timer(pos):start(1.0)
 end
 
 minetest.register_node("beer_test:barrel",{
@@ -65,11 +68,9 @@ minetest.register_node("beer_test:barrel",{
         minetest.get_node_timer(pos):start(1.0)
     end,
     on_metadata_inventory_put = function(pos)
-        -- start timer function, it will sort out whether furnace can burn or not.
         minetest.get_node_timer(pos):start(1.0)
     end,
     on_metadata_inventory_take = function(pos)
-        -- check whether the furnace is empty or not.
         minetest.get_node_timer(pos):start(1.0)
     end,
     node_box = {

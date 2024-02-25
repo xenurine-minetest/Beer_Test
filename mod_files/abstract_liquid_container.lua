@@ -1,6 +1,9 @@
 local AbstractLiquidContainer = {}
 
-AbstractLiquidContainer.new = function (pos)
+---@param pos table<string, number>
+---@param environment Environment
+---@return LiquidContainer
+AbstractLiquidContainer.new = function (pos, environment)
     ---@class LiquidContainer
     local self = {}
 
@@ -8,7 +11,7 @@ AbstractLiquidContainer.new = function (pos)
     local meta
 
     -- private method declarations
-    local initialize, setLiquidLevel, setLiquidLevelLimit, setLiquidType
+    local initialize, setLiquidLevel, setLiquidLevelLimit, setLiquidType, setTemperature, getTransmittedEnergy
 
     -- constructor
     local construct = function ()
@@ -21,15 +24,45 @@ AbstractLiquidContainer.new = function (pos)
 
     -- public methods
 
+    ---@type fun():boolean
+    self.heat = function ()
+        local oldTemperature = self.getTemperature()
+
+        local transmittedEnergy = getTransmittedEnergy()
+
+        local addedTemperature = transmittedEnergy/(4190*self.getLiquidLevel())
+
+        if (addedTemperature == 1/0 or addedTemperature == 1/-0) then
+            addedTemperature = 0
+        end
+
+        setTemperature(self.getTemperature() + addedTemperature)
+
+        if (oldTemperature == self.getTemperature()) then
+            return false
+        end
+
+        return true
+    end
+
+    self.getEnvironmentTemperature = function()
+        return 20
+    end
+
+    self.getMaximumTemperature = function ()
+        return 100
+    end
+
     ---fill barrel with liquid
     ---returns overflow
     ---@param fillAmount
     ---@param fillType string
     ---@return number "overflow"
-    self.fillLiquid = function (fillAmount, fillType)
+    self.fillLiquid = function (fillAmount, fillType, fillTemperature)
         local liquidType = self.getLiquidType()
         local liquidLevel = self.getLiquidLevel()
         local liquidLevelLimit = self.getLiquidLevelLimit()
+        local liquidTemperature = self.getTemperature()
 
         --reject if liquidType doesn't match
         if (liquidType ~= "" and liquidType ~= fillType) then
@@ -40,14 +73,22 @@ AbstractLiquidContainer.new = function (pos)
             setLiquidType(fillType)
         end
 
+        local actuallyFillAmount = 0
+        local overflowAmount = 0
         if (fillAmount + liquidLevel > liquidLevelLimit) then
-            setLiquidLevel(liquidLevelLimit)
-            return fillAmount + liquidLevel - liquidLevelLimit
+            actuallyFillAmount = liquidLevelLimit
+            overflowAmount = fillAmount + liquidLevel - liquidLevelLimit
+        else
+            actuallyFillAmount = fillAmount
         end
 
-        setLiquidLevel(liquidLevel + fillAmount)
+        local targetAmount = liquidLevel + actuallyFillAmount
+        local targetTemperature = (liquidLevel * liquidTemperature + actuallyFillAmount * fillTemperature) / targetAmount
 
-        return 0
+        setLiquidLevel(targetAmount)
+        setTemperature(targetTemperature)
+
+        return overflowAmount
     end
 
     ---takes liquid from barrel, returns actually retrieved amount and liquid type
@@ -90,6 +131,11 @@ AbstractLiquidContainer.new = function (pos)
         return meta:get_string("liquidType")
     end
 
+    ---@type fun():number
+    self.getTemperature = function()
+        return meta:get_float("temperature")
+    end
+
     -- abstract function
     self.updateDisplay = function () end
 
@@ -97,6 +143,7 @@ AbstractLiquidContainer.new = function (pos)
         setLiquidLevel(0)
         setLiquidLevelLimit(10)
         setLiquidType(nil)
+        setTemperature(self.getEnvironmentTemperature())
         self.updateDisplay()
         meta:set_int("initializedLiquidContainer", 1)
     end
@@ -114,6 +161,37 @@ AbstractLiquidContainer.new = function (pos)
     setLiquidType = function(liquidType)
         meta:set_string("liquidType", liquidType)
         self.updateDisplay()
+    end
+
+    setTemperature = function(temperature)
+        --minetest.log("action", "set temp to: " .. temperature)
+        meta:set_float("temperature", temperature)
+        self.updateDisplay()
+    end
+
+    ---@type fun():number Energy in Watt
+    getTransmittedEnergy = function()
+        local temperature = self.getTemperature()
+
+        local north = environment.north()
+        local northE = north.uValue * (north.temperature - temperature)
+
+        local south = environment.south()
+        local southE = south.uValue * (south.temperature - temperature)
+
+        local east = environment.east()
+        local eastE = east.uValue * (east.temperature - temperature)
+
+        local west = environment.west()
+        local westE = west.uValue * (west.temperature - temperature)
+
+        local top = environment.top()
+        local topE = top.uValue * (top.temperature - temperature)
+
+        local bottom = environment.bottom()
+        local bottomE = bottom.uValue * (bottom.temperature - temperature)
+
+        return northE + southE + eastE + westE + topE + bottomE
     end
 
     construct()
