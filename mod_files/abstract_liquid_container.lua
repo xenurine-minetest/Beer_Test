@@ -41,7 +41,13 @@ AbstractLiquidContainer.new = function (pos, environment)
             addedTemperature = 0
         end
 
-        setTemperature(self.getTemperature() + addedTemperature)
+        local newTemperature = self.getTemperature() + addedTemperature
+
+        if (newTemperature > 100) then
+            newTemperature = 100
+        end
+
+        setTemperature(newTemperature)
 
         if (oldTemperature == self.getTemperature()) then
             return false
