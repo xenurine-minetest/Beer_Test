@@ -41,9 +41,33 @@ local function onRightClick(pos, node, clicker, itemStack, pointed_thing)
     local barrel = Barrel.new(pos, Environment.new(pos))
 
     if (itemStack:get_name() == "bucket:bucket_water") then
-        barrel.fillLiquid(1, 'water', 20)
+        local iMeta = itemStack:get_meta()
+        local temperature = iMeta:get("temperature")
+        if (temperature == nil) then
+            temperature = 20
+        end
+        itemStack:take_item(1)
+
+        local overflow = barrel.fillLiquid(1, 'water', temperature)
+
+        if (overflow == 0) then
+            local playerInventory = minetest.get_inventory({ type="player", name=clicker:get_player_name() })
+            playerInventory:add_item("main", ItemStack("bucket:bucket_empty"))
+        end
     elseif (itemStack:get_name() == "bucket:bucket_empty") then
-        barrel.takeLiquid(1)
+        local amount, temperature = barrel.takeLiquid(1)
+
+        if (amount > 0) then
+            local playerInventory = minetest.get_inventory(
+                    { type="player", name=clicker:get_player_name() }
+            )
+
+            itemStack:take_item(1)
+            local waterBucketStack = ItemStack("bucket:bucket_water")
+            local iMeta = waterBucketStack:get_meta()
+            iMeta:set_float("temperature", temperature)
+            local leftover = playerInventory:add_item("main", waterBucketStack)
+        end
     else
         formSpec.open(barrel,"beer_test:barrel", clicker:get_player_name())
     end
@@ -58,7 +82,7 @@ minetest.register_node("beer_test:barrel",{
     "beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png", "beer_test_barrel_side_2.png"},
     paramtype = "light",
     paramtype2 = "facedir",
-    groups = {cracky=2},
+    groups = {cracky=2, explody=4, flammable=4},
     sounds = default.node_sound_wood_defaults(),
     can_dig = canDig,
 	on_timer = onTimer,

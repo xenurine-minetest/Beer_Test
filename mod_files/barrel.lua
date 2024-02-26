@@ -103,8 +103,13 @@ Barrel.new = function (pos, environment)
     end
 
     updateFormSpec = function()
-        self.setFormSpec(Barrel.formspecs.default(
-                {level = self.getLiquidLevel(), limit = self.getLiquidLevelLimit(), type = self.getLiquidType()},
+        self.setFormSpec(Barrel.formspecs.debug(
+                {
+                            level = self.getLiquidLevel(),
+                            limit = self.getLiquidLevelLimit(),
+                            type = self.getLiquidType(),
+                            temperature = self.getTemperature()
+                        },
                 "nodemeta:"..pos.x..","..pos.y..","..pos.z
         ))
     end
@@ -192,8 +197,47 @@ Barrel.formspecs = {
             --default.get_hotbar_bg(0, 4.5)
         }, "")
     end, 
-    soaking = function ()
+    debug = function (liquidData, nodePosition)
+        local fillStateInPercent = liquidData.level/liquidData.limit*100
+        local infoText = ""
 
+        if (liquidData.type == "") then
+            infoText = "Empty Barrel"
+        else
+            infoText = "Barrel filled with " .. liquidData.type .. " "
+                    .. liquidData.level .. "L / " .. " " .. liquidData.limit .. "L"
+        end
+
+        local function verticalBar (x, y, width, height, percent)
+            local backGround = "image["..x..","..y..";"..width..","..height..";gui_barrel_bar.png]"
+            local foreground = ""
+
+            if (percent > 0 ) then
+                local heightP = height/100*percent
+                local yP = height - heightP +y
+
+                foreground = "image["..x..","..yP..";"..width..","..heightP..";gui_barrel_bar_fg.png]"
+            end
+
+            return backGround .. foreground
+        end
+
+        return table.concat({
+            "formspec_version[6]",
+            "size[12,10]",
+            "position[0.5,0.5]",
+            "padding[0.1,0.1]",
+            "label[0.375,0.5;"..infoText.."]",
+            verticalBar(1.55, 1, 1, 3, fillStateInPercent),
+            "list["..nodePosition..";src;4.05,3;1,1;]",
+            "image[5.3,3;1,1;gui_barrel_arrow_bg.png]",
+            "list["..nodePosition..";dst;6.55,3;1,1;]",
+            "button[5,1.2;2,0.5;test;Seal Barrel]",
+            "list[current_player;main;0.3,4.5;8,4;]",
+            "label[7.9,0.5;DEBUG:]",
+            "label[7.9,1;Temperature: "..liquidData.temperature.."°C]"
+            --default.get_hotbar_bg(0, 4.5)
+        }, "")
     end,
     fermenting = function ()
 

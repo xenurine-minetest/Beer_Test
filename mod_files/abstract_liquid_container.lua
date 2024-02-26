@@ -99,7 +99,8 @@ AbstractLiquidContainer.new = function (pos, environment)
     ---takes liquid from barrel, returns actually retrieved amount and liquid type
     ---@param amount number
     ---@return number "amount"
-    ---@return string|nil "liquid type"
+    ---@return number "temperature"
+    ---@return string|nil "liquid type" (deprecated)
     self.takeLiquid = function (amount)
         local liquidType = self.getLiquidType()
         local liquidLevel = self.getLiquidLevel()
@@ -117,7 +118,7 @@ AbstractLiquidContainer.new = function (pos, environment)
             setLiquidType(nil)
         end
 
-        return amount, self.getLiquidType()
+        return amount, self.getTemperature(), self.getLiquidType()
     end
 
     self.getLiquidStatus = function ()
