@@ -1,9 +1,9 @@
-local BeerTest = {}
+local Handlers = {}
 
-BeerTest.soakRecipeHandler = function ()
+Handlers.soakRecipeHandler = function ()
     local self = {}
 
-    local isSourceNodeRegistered
+    ---@type table
     local recipes = {}
 
     self.getDestinationForSource = function (sourceNode)
@@ -40,11 +40,15 @@ BeerTest.soakRecipeHandler = function ()
         })
     end
 
+    return self
+end
 
+Handlers.addWaterNode = function ()
+    local self = {}
 
     return self
 end
 
 return {
-    soakRecipeHandler = BeerTest.soakRecipeHandler()
+    soakRecipeHandler = Handlers.soakRecipeHandler()
 }
