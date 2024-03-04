@@ -10,6 +10,11 @@ Environment.new = function(pos)
 
     environmentTemperature = 20
 
+    ---@type fun(): number
+    self.getEnvironmentTemperature = function ()
+        return environmentTemperature
+    end
+
     ---@type fun():ThermalData
     self.north = function ()
         local nodePos = {x = pos.x, y = pos.y, z = pos.z + 1}
@@ -68,7 +73,3 @@ Environment.new = function(pos)
 end
 
 return Environment
-
----@class ThermalData
----@field uValue number Amount of thermal transmittance by node material in W/(m²*K)
----@field temperature number temperature of node

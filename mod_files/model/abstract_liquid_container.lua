@@ -1,3 +1,8 @@
+local modPath = minetest.get_modpath(minetest.get_current_modname()) .. "/mod_files"
+
+---@type IngredientMetaDataHelper
+local IngredientMetaDataHelper = dofile(modPath .. "/lib/ingredient_meta_data_helper.lua")
+
 local AbstractLiquidContainer = {}
 
 ---@param pos table<string, number>
@@ -11,7 +16,7 @@ AbstractLiquidContainer.new = function (pos, environment)
     local meta
 
     -- private method declarations
-    local initialize, setLiquidLevel, setLiquidLevelLimit, setLiquidType, setTemperature, getTransmittedEnergy
+    local initialize, setLiquidLevel, setLiquidLevelLimit, setLiquidType, setTemperature, getTransmittedEnergy, mixIngredients
 
     -- constructor
     local construct = function ()
@@ -24,8 +29,10 @@ AbstractLiquidContainer.new = function (pos, environment)
 
     -- public methods
 
+    ---calculates heating/cooling dependent of environment
     ---@type fun():boolean
     self.heat = function ()
+        self.step()
         local oldTemperature = self.getTemperature()
 
         local transmittedEnergy = getTransmittedEnergy()
@@ -56,20 +63,28 @@ AbstractLiquidContainer.new = function (pos, environment)
         return true
     end
 
-    self.getEnvironmentTemperature = function()
-        return 20
+    ---processes ingredients (enzymatic activity)
+    ---@type fun()
+    self.runIngredientProcessing = function()
+        local processedIngredients = IngredientMetaDataHelper.calculator(
+                IngredientMetaDataHelper.get(meta),
+                self.getTemperature()
+        )
+
+        IngredientMetaDataHelper.set(meta, processedIngredients)
+        self.updateDisplay()
     end
 
+    ---gets highest possible temperature
+    ---@type fun():number
     self.getMaximumTemperature = function ()
         return 100
     end
 
     ---fill barrel with liquid
     ---returns overflow
-    ---@param fillAmount
-    ---@param fillType string
-    ---@return number "overflow"
-    self.fillLiquid = function (fillAmount, fillType, fillTemperature)
+    ---@type fun(liquidData:LiquidData, fillType:string):number
+    self.fillLiquid = function (liquidData, fillType)
         local liquidType = self.getLiquidType()
         local liquidLevel = self.getLiquidLevel()
         local liquidLevelLimit = self.getLiquidLevelLimit()
@@ -77,7 +92,7 @@ AbstractLiquidContainer.new = function (pos, environment)
 
         --reject if liquidType doesn't match
         if (liquidType ~= "" and liquidType ~= fillType) then
-            return fillAmount
+            return liquidData.amount
         end
 
         if (liquidType == "" and liquidLevel == 0) then
@@ -86,16 +101,18 @@ AbstractLiquidContainer.new = function (pos, environment)
 
         local actuallyFillAmount = 0
         local overflowAmount = 0
-        if (fillAmount + liquidLevel > liquidLevelLimit) then
-            actuallyFillAmount = liquidLevelLimit
-            overflowAmount = fillAmount + liquidLevel - liquidLevelLimit
+        
+        if (liquidData.amount + liquidLevel > liquidLevelLimit) then
+            actuallyFillAmount = liquidLevelLimit - liquidLevel
+            overflowAmount = liquidData.amount - actuallyFillAmount
         else
-            actuallyFillAmount = fillAmount
+            actuallyFillAmount = liquidData.amount
         end
 
         local targetAmount = liquidLevel + actuallyFillAmount
-        local targetTemperature = (liquidLevel * liquidTemperature + actuallyFillAmount * fillTemperature) / targetAmount
+        local targetTemperature = (liquidLevel * liquidTemperature + actuallyFillAmount * liquidData.temperature) / targetAmount
 
+        mixIngredients(actuallyFillAmount, liquidLevel, liquidData.ingredients)
         setLiquidLevel(targetAmount)
         setTemperature(targetTemperature)
 
@@ -103,18 +120,19 @@ AbstractLiquidContainer.new = function (pos, environment)
     end
 
     ---takes liquid from barrel, returns actually retrieved amount and liquid type
-    ---@param amount number
-    ---@return number "amount"
-    ---@return number "temperature"
-    ---@return string|nil "liquid type" (deprecated)
+    ---@type fun(amount:number):LiquidData
     self.takeLiquid = function (amount)
-        local liquidType = self.getLiquidType()
         local liquidLevel = self.getLiquidLevel()
 
         if (liquidLevel < amount) then
             setLiquidLevel(0)
             setLiquidType(nil)
-            return liquidLevel, liquidType
+
+            return {
+                amount = liquidLevel,
+                temperature = self.getTemperature(),
+                ingredients = IngredientMetaDataHelper.get(meta)
+            }
         end
 
         liquidLevel = liquidLevel - amount
@@ -124,21 +142,24 @@ AbstractLiquidContainer.new = function (pos, environment)
             setLiquidType(nil)
         end
 
-        return amount, self.getTemperature(), self.getLiquidType()
+        return {
+            amount = amount,
+            temperature = self.getTemperature(),
+            ingredients = IngredientMetaDataHelper.get(meta)
+        }
     end
 
-    self.getLiquidStatus = function ()
-        return self.getLiquidLevel(), self.getLiquidType()
-    end
-
+    ---@type fun():number
     self.getLiquidLevel = function ()
         return meta:get_int("liquidLevel")
     end
 
+    ---@type fun():number
     self.getLiquidLevelLimit = function ()
         return meta:get_int("liquidLevelLimit")
     end
 
+    ---@type fun():string
     self.getLiquidType = function()
         return meta:get_string("liquidType")
     end
@@ -148,35 +169,42 @@ AbstractLiquidContainer.new = function (pos, environment)
         return meta:get_float("temperature")
     end
 
-    -- abstract function
+    ---abstract function, will be overridden by child classes
+    ---@type fun()
     self.updateDisplay = function () end
 
+    ---initializes node metadata when node is placed
+    ---@type fun()
     initialize = function()
         setLiquidLevel(0)
         setLiquidLevelLimit(10)
         setLiquidType(nil)
-        setTemperature(self.getEnvironmentTemperature())
+        setTemperature(environment.getEnvironmentTemperature())
+        IngredientMetaDataHelper.set(meta, IngredientMetaDataHelper.get(meta))
         self.updateDisplay()
         meta:set_int("initializedLiquidContainer", 1)
     end
 
+    ---@type fun(liquidLevel:number)
     setLiquidLevel = function (liquidLevel)
         meta:set_int("liquidLevel", liquidLevel)
         self.updateDisplay()
     end
 
+    ---@type fun(liquidLevelLimit:number)
     setLiquidLevelLimit = function (liquidLevelLimit)
         meta:set_int("liquidLevelLimit", liquidLevelLimit)
         self.updateDisplay()
     end
 
+    ---@type fun(liquidType:string)
     setLiquidType = function(liquidType)
         meta:set_string("liquidType", liquidType)
         self.updateDisplay()
     end
 
+    ---@type fun(temperature:number)
     setTemperature = function(temperature)
-        --minetest.log("action", "set temp to: " .. temperature)
         meta:set_float("temperature", temperature)
         self.updateDisplay()
     end
@@ -206,8 +234,22 @@ AbstractLiquidContainer.new = function (pos, environment)
         return northE + southE + eastE + westE + topE + bottomE
     end
 
+    ---mixes ingredients when new liquid is filled in and saves them
+    ---@type fun(actuallyFillAmount:number, oldLiquidLevel:number, ingredients:table<string,number>)
+    mixIngredients = function (actuallyFillAmount, oldLiquidLevel, ingredients)
+        local existingIngredients = IngredientMetaDataHelper.get(meta)
+
+        for key,value in pairs(existingIngredients) do
+            existingIngredients[key] = (value * oldLiquidLevel + actuallyFillAmount * ingredients[key]) / (actuallyFillAmount + oldLiquidLevel)
+        end
+
+        IngredientMetaDataHelper.set(meta, existingIngredients)
+        self.updateDisplay()
+    end
+
     construct()
     return self
 end
 
 return AbstractLiquidContainer
+
