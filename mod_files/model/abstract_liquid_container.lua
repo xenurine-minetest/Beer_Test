@@ -32,7 +32,7 @@ AbstractLiquidContainer.new = function (pos, environment)
     ---calculates heating/cooling dependent of environment
     ---@type fun():boolean
     self.heat = function ()
-        self.step()
+        self.runIngredientProcessing()
         local oldTemperature = self.getTemperature()
 
         local transmittedEnergy = getTransmittedEnergy()
