@@ -66,8 +66,9 @@ beer_test.soakRecipeHandler.registerSoakRecipe("beer_test:cracked_barley", "beer
 
 print("")
 print("###########################################################")
-print("Beer_Test has loaded successfully ")	
+print("Beer_Test has loaded successfully ")
 
 
- 
 
+print("Beer_test: Loading 'player_effects.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/lib/player_effects.lua")
