@@ -84,6 +84,7 @@ drawtype = "nodebox",
 	buildable_to = true,
 	groups = {cracky=2,not_in_creative_inventory=1},
 	sounds = default.node_sound_wood_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 			type = "fixed",
 			fixed = {
@@ -116,6 +117,7 @@ drawtype = "nodebox",
 	buildable_to = true,
 	groups = {cracky=2,not_in_creative_inventory=1},
 	sounds = default.node_sound_wood_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 			type = "fixed",
 			fixed = {
@@ -254,6 +256,7 @@ description = "Wild hops",
 	groups = {chopspy=2, oddly_breakable_by_hand=3, flammable=2, plant=1},
 	--light_source = LIGHT_MAX-1,
 	sounds = default.node_sound_wood_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 			type = "fixed",
 			fixed = {

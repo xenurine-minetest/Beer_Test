@@ -10,6 +10,7 @@ minetest.register_node("beer_test:barrel_mixed_beer_grain", {
     paramtype2 = "facedir",
     groups = {choppy=2,oddly_breakable_by_hand=2},
     sounds = default.node_sound_wood_defaults(),
+    use_texture_alpha = "blend",
     on_construct = function(pos)
         local meta = minetest.get_meta(pos)
         meta:set_string("infotext", "Barrel (With Mixed Beer Grain)")
@@ -237,6 +238,7 @@ minetest.register_node("beer_test:tankard_unbrewed_beer", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -282,6 +284,7 @@ minetest.register_node("beer_test:tankard_light_beer", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -326,7 +329,8 @@ minetest.register_node("beer_test:tankard_beer", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
-		node_box = {
+	use_texture_alpha = "blend",
+	node_box = {
 		type = "fixed",
 		fixed = {
 			{-0.18, -0.5, 0.125, 0.18, 0.18, 0.18},
@@ -371,7 +375,8 @@ minetest.register_node("beer_test:tankard_dark_beer", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
-		node_box = {
+	use_texture_alpha = "blend",
+	node_box = {
 		type = "fixed",
 		fixed = {
 			{-0.18, -0.5, 0.125, 0.18, 0.18, 0.18},

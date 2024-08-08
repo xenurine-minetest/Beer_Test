@@ -97,7 +97,7 @@ function beer_test.register_rope(name, def )
 		groups = groups,
 		drop = def.drop,
 		sounds = def.sounds,
-		use_texture_alpha = def.use_texture_alpha or false,
+		use_texture_alpha = def.use_texture_alpha or "blend",
 		node_box = {
 			type = "connected",
 			fixed = def.fixed_box,

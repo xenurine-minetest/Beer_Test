@@ -11,6 +11,7 @@
 	walkable = false,
 	groups = {cracky=2},
 	sounds = default.node_sound_wood_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 			type = "fixed",
 			fixed = {

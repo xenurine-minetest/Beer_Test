@@ -19,6 +19,7 @@ minetest.register_node("beer_test:barrel", {
     paramtype2 = "facedir",
     groups = {cracky=2},
     sounds = default.node_sound_wood_defaults(),
+    use_texture_alpha = "blend",
 	on_punch = function(pos, node, puncher)
 		local tool = puncher:get_wielded_item():get_name()
 		if tool and tool == "beer_test:mixed_beer_grain" then
@@ -81,6 +82,7 @@ minetest.register_node("beer_test:tankard", {
 	paramtype2 = "facedir",
 	groups = {cracky=3,dig_immediate=3},
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -154,6 +156,7 @@ minetest.register_node("beer_test:tankard_rum", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -228,6 +231,7 @@ minetest.register_node("beer_test:tankard_moonsine", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -302,6 +306,7 @@ minetest.register_node("beer_test:tankard_mulledWine", {
 	groups = {cracky=3,dig_immediate=3},
 	on_use = minetest.item_eat(1, "beer_test:tankard"),
 	sounds = default.node_sound_tankard_defaults(),
+	use_texture_alpha = "blend",
 	node_box = {
 		type = "fixed",
 		fixed = {
