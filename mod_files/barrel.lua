@@ -1,3 +1,6 @@
+print(dump2(beer_test))
+local BarrelController = beer_test.api.classes.Nodes.Barrel.Controller()
+
 -----------------
 -- beer barrle --
 -----------------
@@ -12,34 +15,9 @@ minetest.register_node("beer_test:barrel", {
     groups = {cracky=2},
     sounds = default.node_sound_wood_defaults(),
     use_texture_alpha = "blend",
-	on_punch = function(pos, node, puncher)
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_beer_grain" then
-			node.name = "beer_test:barrel_mixed_beer_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_beer_grain"))
-		end
-			
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_ale_grain" then
-			node.name = "beer_test:barrel_mixed_ale_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_ale_grain"))
-			
-		end
-		
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_mead_grain" then
-			node.name = "beer_test:barrel_mixed_mead_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_mead_grain"))
-			
-		end
-	end,
-    on_construct = function(pos)
-        local meta = minetest.get_meta(pos)
-        meta:set_string("infotext", "Barrel")
-    end,
+	on_rightclick = BarrelController.onRightClick,
+    on_construct = BarrelController.onConstruct,
+    --on_construct = function(pos) print(dump2(pos))end,
     node_box = {
         type = "fixed",
         fixed = {
@@ -55,8 +33,7 @@ minetest.register_node("beer_test:barrel", {
         fixed = {
             {-0.4375, -0.5, -0.4375, 0.4375, 0.5, 0.4375}, -- NodeBox1
         },
-    }, 
-		
+    },
 })
 
 minetest.register_node("beer_test:brewing_barrel", {
@@ -91,6 +68,10 @@ minetest.register_node("beer_test:brewing_barrel", {
             {-0.5, -0.5, 0.3125, 0.5, -0.375, 0.4375}, -- NodeBox8
 			{-0.5, -0.5, -0.4375, 0.5, -0.375, -0.3125}, -- NodeBox9
         },
-    }, 
+    },
+	on_rightclick = BarrelController.onRightClick,
+    on_construct = BarrelController.onConstruct,
 })
+
+
 print("Beer_test: barrel.lua            [ok]")

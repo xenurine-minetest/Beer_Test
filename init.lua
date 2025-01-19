@@ -1,3 +1,41 @@
+function lazyLoad(file_path)
+    local cache = nil
+    return function()
+        if not cache then
+            cache = dofile(file_path)
+        end
+        return cache
+    end
+end
+
+beer_test = {}
+local modPath = minetest.get_modpath("beer_test") .. "/mod_files/"
+
+beer_test.api = {
+    classes = {
+        Components = {
+            LiquidContainer = lazyLoad(modPath.."classes/components/liquidcontainer.lua"),
+            MetadataStorage = lazyLoad(modPath.."classes/components/metadatastorage.lua"),
+            Notifier = lazyLoad(modPath.."classes/components/notifier.lua"),
+        },
+        Nodes = {
+                Barrel = 
+                {
+                    Model = lazyLoad(modPath.."classes/nodes/barrel/model.lua"),
+                    Controller = lazyLoad(modPath.."classes/nodes/barrel/controller.lua"),
+                    ViewModel = lazyLoad(modPath.."classes/nodes/barrel/viewmodel.lua"),
+                    FormSpecs = lazyLoad(modPath.."classes/nodes/barrel/formspecs.lua"),
+                },
+        },
+        Cache = {
+            NodeCache = lazyLoad(modPath.."classes/cache/nodecache.lua"),
+            PlayerCache = lazyLoad(modPath.."classes/cache/playercache.lua"),
+        },
+        Helpers = lazyLoad(modPath.."classes/helpers.lua"),
+        View = lazyLoad(modPath.."classes/view.lua")
+    }
+}
+
 print("Loading Beer_Test")
 print("###########################################################")
 print("")
@@ -53,8 +91,8 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/barrel.lua")
 
 print("")
 print("###########################################################")
-print("Beer_Test has loaded successfully ")	
+print("Beer_Test has loaded successfully ")
 
 
- 
+
 
