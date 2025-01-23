@@ -78,7 +78,6 @@ minetest.register_on_dignode(function(pos)
 	end
 end)
 
-beer_test = {}
 function beer_test.register_rope(name, def )
 	-- possibly remove this since they will be only one type of flat rope. 
 

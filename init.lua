@@ -1,3 +1,30 @@
+local modulePath = minetest.get_modpath("beer_test").."/mod_files/modules"
+
+local function lazyload(file_path)
+    local cache = nil
+    return function()
+        if not cache then
+            cache = dofile(file_path)
+        end
+        return cache
+    end
+end
+
+beer_test = {
+    modules = {
+        Components = {
+            Fillable = lazyload(modulePath .. "/components/fillable.lua"),
+            Sealable = lazyload(modulePath .. "/components/sealable.lua")
+        },
+        EventSystem = lazyload(modulePath .. "/eventsystem.lua"),
+        Storage = lazyload(modulePath .. "/storage.lua"),
+        OpenedFormspecStorage = lazyload(modulePath .. "/cache/openedformspeccache.lua")
+    },
+    register = {
+        Fillable = lazyload(modulePath .. "/registerfillable.lua")
+    }
+}
+
 print("Loading Beer_Test")
 print("###########################################################")
 print("")
