@@ -51,7 +51,6 @@ OpenedFormspecCache.getPlayerNamesByPos = function (pos)
 end
 
 OpenedFormspecCache.remove = function (pos, playerName)
-    print("remove()")
     if (playerName == nil) then
         removeByPos(pos)
     else

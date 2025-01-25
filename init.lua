@@ -17,7 +17,7 @@ beer_test = {
             Sealable = lazyload(modulePath .. "/components/sealable.lua")
         },
         EventSystem = lazyload(modulePath .. "/eventsystem.lua"),
-        Storage = lazyload(modulePath .. "/storage.lua"),
+        PropertyStorage = lazyload(modulePath .. "/propertystorage.lua"),
         OpenedFormspecStorage = lazyload(modulePath .. "/cache/openedformspeccache.lua")
     },
     register = {

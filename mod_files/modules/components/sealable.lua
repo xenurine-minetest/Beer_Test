@@ -1,6 +1,3 @@
-local EventSystem = beer_test.modules.EventSystem()
-local Storage = beer_test.modules.Storage()
-
 local Sealable = {}
 
 local sealedField = "sealed"
@@ -13,19 +10,11 @@ local function isSealable(properties)
     return true
 end
 
-Sealable.create = function (pos)
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta) or {}
-
+Sealable.create = function (properties)
     properties[sealedField] = false
-
-    Storage.set(properties, meta)
 end
 
-Sealable.seal = function (pos)
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta) or {}
-
+Sealable.seal = function (properties)
     if(isSealable(properties) == false) then
         return false
     end
@@ -35,15 +24,11 @@ Sealable.seal = function (pos)
     end
 
     properties[sealedField] = true
-    Storage.set(properties, meta)
-    EventSystem.triggerEvent('fillStateChanged', pos, properties)
 
     return true
 end
 
-Sealable.unseal = function (pos)
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta) or {}
+Sealable.unseal = function (properties)
 
     if(isSealable(properties) == false) then
         return false
@@ -54,8 +39,6 @@ Sealable.unseal = function (pos)
     end
 
     properties[sealedField] = false
-    Storage.set(properties, meta)
-    EventSystem.triggerEvent('fillStateChanged', pos, properties)
 
     return true
 end

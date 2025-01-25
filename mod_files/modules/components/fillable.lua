@@ -1,12 +1,9 @@
-local EventSystem = beer_test.modules.EventSystem()
-local Storage = beer_test.modules.Storage()
-
 local liquidLevelField = "liquidLevel"
 local maxCapacityField = "maxCapacity"
 
 local Fillable = {}
 
-local function isLiquidContainer(properties) 
+local function isLiquidContainer(properties)
     if (properties[liquidLevelField] == nil or properties[maxCapacityField] == nil) then
         return false
     end
@@ -14,20 +11,12 @@ local function isLiquidContainer(properties)
     return true
 end
 
-Fillable.create = function (pos, maxCapacity) 
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta) or {}
-
+Fillable.create = function (properties, maxCapacity)
     properties[liquidLevelField] = 0
     properties[maxCapacityField] = maxCapacity
-
-    Storage.set(properties, meta)
 end
 
-Fillable.fill = function(pos, amount) 
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta)
-
+Fillable.fill = function(properties, amount)
     if(isLiquidContainer(properties) == false) then
         return false
     end
@@ -37,16 +26,11 @@ Fillable.fill = function(pos, amount)
     end
 
     properties[liquidLevelField] = properties[liquidLevelField] + amount
-    Storage.set(properties, meta)
-    EventSystem.triggerEvent('fillStateChanged', pos, properties)
 
     return true
 end
 
-Fillable.drain = function(pos, amount) 
-    local meta = minetest.get_meta(pos)
-    local properties = Storage.get(meta)
-
+Fillable.drain = function(properties, amount)
     if(isLiquidContainer(properties) == false) then
         return false
     end
@@ -56,8 +40,6 @@ Fillable.drain = function(pos, amount)
     end
 
     properties[liquidLevelField] = properties[liquidLevelField] - amount
-    Storage.set(properties, meta)
-    EventSystem.triggerEvent('fillStateChanged', pos, properties)
 
     return true
 end
