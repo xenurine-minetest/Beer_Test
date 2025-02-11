@@ -34,6 +34,16 @@ local getOnContructCallback = function(definition)
             if(definition.sealable == true) then
                 Sealable.create(properties)
             end
+
+            if(type(definition.inventories) == "table") then
+                local meta = minetest.get_meta(pos)
+		        local inv = meta:get_inventory()
+
+                for name, size in pairs(definition.inventories) do
+                    if(type(name) ~= "string" or type(size) ~= "number") then error() end
+                    inv:set_size(name, size)
+                end
+            end
         end)
     end
 end
@@ -66,10 +76,12 @@ local function getrightClickCallback(nodeName, definition)
             end
 
             OpenedFormspecStorage.add(pos, playerName)
+            
             minetest.show_formspec(
                 playerName,
                 nodeName,
                 definition.formspec(
+                    pos,
                     PropertyStorage.readonly(minetest.get_meta(pos))
                 )
             )
@@ -107,7 +119,7 @@ local getChangeEventHandler = function(definition, nodeName, nodeVariantNames)
 
         local playerNames = OpenedFormspecStorage.getPlayerNamesByPos(pos)
         for _,playerName in ipairs(playerNames) do
-            minetest.show_formspec(playerName,nodeName,definition.formspec(properties))
+            minetest.show_formspec(playerName,nodeName,definition.formspec(pos, properties))
         end
     end
 end
@@ -127,21 +139,34 @@ return function (nodeName, definition)
         local nodeVariantName = nodeName..nodeNameAppendix
         nodeVariantNames[variantName] = nodeVariantName
 
-        minetest.register_node(nodeVariantName, {
+        local variantRegistration = {
             description = definition.description,
-            drawtype = definition.drawtype,
             paramtype = definition.paramtype,
             paramtype2 = definition.paramtype2,
-            groups = definition.groups,
             sounds = definition.sounds,
             use_texture_alpha = definition.use_texture_alpha,
-            tiles = variant.tiles,
             on_punch = definition.on_punch,
             on_construct = definition.on_construct or getOnContructCallback(definition),
             on_rightclick = definition.on_rightclick or getrightClickCallback(nodeName, definition),
-            node_box = variant.node_box,
             selection_box = definition.selection_box,
-        })
+            drop = nodeName,
+            tiles = variant.tiles,
+            drawtype = variant.drawtype,
+        }
+
+        if (variant.drawtype == "nodebox") then
+            variantRegistration.node_box = variant.node_box
+        elseif (variant.drawtype == "mesh") then
+            variantRegistration.mesh = variant.mesh
+        end
+
+        if (not variant.default) then
+            variantRegistration.groups = {not_in_creative_inventory = 1}
+        end
+
+        print(dump2(variantRegistration, "REGISTRATION"))
+
+        minetest.register_node(nodeVariantName, variantRegistration)
     end
 
     EventSystem.registerEvent(

@@ -1,4 +1,40 @@
 local FillableRegistration = beer_test.register.Fillable()
+local ViewComponents = beer_test.modules.View.Components()
+
+local formspecs = {
+	unsealed = function(pos, properties)
+		local levelString = properties.liquidLevel .. " of " .. properties.maxCapacity .. " L"
+
+		
+		return  "formspec_version[8]"..
+				"size[11,10]" ..
+				"position[0.5,0.5]"..
+				"anchor[0.5,0.5]"..
+				"padding[0.1,0.1]"..
+				ViewComponents.verticalBar(0.5,1,1,3,(properties.liquidLevel/properties.maxCapacity*100), "beer_test_bar_blue.png")..
+				"label[0.5,0.5; Level: " .. levelString .. "]" ..
+				"button[2.0,2.0;2,1;seal;Seal]"..
+				"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. ";input;4.5,1;1,1;]" ..
+				"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. ";output;4.5,2.5;1,1;]" ..
+            	"list[current_player;main;0.5,5;8,4;]"
+				
+	end,
+
+	sealed = function(pos, properties)
+		local levelString = properties.liquidLevel .. " of " .. properties.maxCapacity .. " L"
+		
+		return  "formspec_version[8]"..
+				"size[11,10]" ..
+				"position[0.5,0.5]"..
+				"anchor[0.5,0.5]"..
+				"padding[0.1,0.1]"..
+				ViewComponents.verticalBar(0.5,1,1,3,(properties.liquidLevel/properties.maxCapacity*100), "beer_test_bar_blue.png")..
+				"label[0.5,0.5; Level: " .. levelString .. "]" ..
+				"button[2.0,2.0;2,1;unseal;Unseal]"..
+				"label[4.5,2; Sealed barrel will process stuff ...]" ..
+            	"list[current_player;main;0.5,5;8,4;]"
+	end
+}
 
 FillableRegistration("beer_test:barrel", {
 	description = "Barrel",
@@ -8,52 +44,76 @@ FillableRegistration("beer_test:barrel", {
     sounds = default.node_sound_wood_defaults(),
     use_texture_alpha = "blend",
 	sealable = true,
+	inventories = {
+		input = 1,
+		output = 1
+	},
+	canSoak = {
+		inputInventory = "input",
+		outputInventory = "output"
+	},
 	variants = {
-		first = {
+		empty = {
 			default = true,
-			tiles = {
-				"beer_test_barrel_top.png",
-				"beer_test_barrel_top.png",
-				"beer_test_barrel_side.png",
-				"beer_test_barrel_side.png",
-				"beer_test_barrel_side.png",
-				"beer_test_barrel_side.png"
-			},
-			drawtype = "nodebox",
-			node_box = {
-				type = "fixed",
-				fixed = {
-					{-0.375, -0.5, 0.3125, 0.4375, 0.5, 0.4375}, -- NodeBox1
-					{-0.4375, -0.5, -0.375, -0.3125, 0.5, 0.4375}, -- NodeBox2
-					{-0.4375, -0.5, -0.4375, 0.375, 0.5, -0.3125}, -- NodeBox3
-					{0.3125, -0.5, -0.4375, 0.4375, 0.5, 0.375}, -- NodeBox4
-					{-0.375, -0.4375, -0.375, 0.375, 0.4375, 0.375}, -- NodeBox5
-				}
-			}
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_empty.obj"
 		},
-		second = {
-			tiles = {
-				"default_wood.png^beer_test_barrel_side.png",
-				"default_wood.png^beer_test_barrel_side.png",
-				"default_wood.png^beer_test_brewing_barrel_side.png",
-    			"default_wood.png^beer_test_brewing_barrel_side.png",
-				"default_wood.png^beer_test_brewing_barrel_front.png",
-				"default_wood.png^beer_test_brewing_barrel_front.png"
-			},
-			drawtype = "nodebox",
-			node_box = {
-				type = "fixed",
-				fixed = {
-					{-0.375, -0.375, -0.5, 0.4375, -0.25, 0.5}, -- NodeBox2
-					{-0.4375, -0.375, -0.5, -0.3125, 0.4375, 0.5}, -- NodeBox3
-					{-0.4375, 0.375, -0.5, 0.375, 0.5, 0.5}, -- NodeBox4
-					{0.3125, -0.3125, -0.5, 0.4375, 0.5, 0.5}, -- NodeBox5
-					{-0.375, -0.3125, -0.4375, 0.4375, 0.4375, 0.4375}, -- NodeBox6
-					{-0.5, -0.5, 0.3125, 0.5, -0.375, 0.4375}, -- NodeBox8
-					{-0.5, -0.5, -0.4375, 0.5, -0.375, -0.3125}, -- NodeBox9
-				}
-			},
-		}
+		oneOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_1.obj"
+		},
+		twoOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_2.obj"
+		},
+		threeOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_3.obj"
+		},
+		fourOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_4.obj"
+		},
+		fiveOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_5.obj"
+		},
+		sixOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_6.obj"
+		},
+		sevenOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_7.obj"
+		},
+		eightOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_8.obj"
+		},
+		nineOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_9.obj"
+		},
+		tenOfTen = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_10.obj"
+		},
+		closed = {
+			tiles = {{name = "beer_test_barrel_combined.png^beer_test_barrel_water.png"}},
+			drawtype = "mesh",
+			mesh = "beer_test_barrel_closed.obj"
+		},
 	},
 	onChange = function (pos, properties, variants)
 		local node = minetest.get_node(pos)
@@ -62,33 +122,62 @@ FillableRegistration("beer_test:barrel", {
 		local infoText = "Barrel (" .. properties.liquidLevel .. "/" .. properties.maxCapacity .. "L)"
 		meta:set_string("infotext", infoText)
 
-		if(properties.liquidLevel < 2) then
-			node.name = variants.first
-			minetest.swap_node(pos, node)
+		if(properties.liquidLevel == 0) then
+			node.name = variants.empty
 		end
 
-		if(properties.liquidLevel >= 2) then
-			node.name = variants.second
-			minetest.swap_node(pos, node)
+		if(properties.liquidLevel == 1) then
+			node.name = variants.oneOfTen
 		end
+
+		if(properties.liquidLevel == 2) then
+			node.name = variants.twoOfTen
+		end
+
+		if(properties.liquidLevel == 3) then
+			node.name = variants.threeOfTen
+		end
+
+		if(properties.liquidLevel == 4) then
+			node.name = variants.fourOfTen
+		end
+
+		if(properties.liquidLevel == 5) then
+			node.name = variants.fiveOfTen
+		end
+
+		if(properties.liquidLevel == 6) then
+			node.name = variants.sixOfTen
+		end
+
+		if(properties.liquidLevel == 7) then
+			node.name = variants.sevenOfTen
+		end
+
+		if(properties.liquidLevel == 8) then
+			node.name = variants.eightOfTen
+		end
+
+		if(properties.liquidLevel == 9) then
+			node.name = variants.nineOfTen
+		end
+
+		if(properties.liquidLevel == 10) then
+			node.name = variants.tenOfTen
+		end
+
+		if(properties.sealed) then
+			node.name = variants.closed
+		end
+
+		minetest.swap_node(pos, node)
 	end,
-	formspec = function(properties)
-		local sealed
-		local sealButton
+	formspec = function(pos,properties)
 		if (properties.sealed) then
-			sealed = "yes"
-			sealButton = "button[1,3;2,1;unseal;Unseal]"
+			return formspecs.sealed(pos, properties)
 		else
-			sealed = "no"
-			sealButton = "button[1,3;2,1;seal;Seal]"
+			return formspecs.unsealed(pos, properties)
 		end
-	
-		local level = properties.liquidLevel .. " of " .. properties.maxCapacity .. " L"
-		
-		return "size[4,4]" ..
-				"label[0,0; Sealed: " .. sealed .. "]" ..
-				"label[0,1; Level: " .. level .. "]" ..
-				sealButton
 	end,
 	on_receive_fields = function (fields, commands)
 		if (fields.seal) then
@@ -100,102 +189,4 @@ FillableRegistration("beer_test:barrel", {
 		end
 	end
 })
-
-
---[[
------------------
--- beer barrle --
------------------
-
-minetest.register_node("beer_test:barrel", {
-    description = "Barrel",
-    drawtype = "nodebox",
-    tiles = {"beer_test_barrel_top.png", "beer_test_barrel_top.png", "beer_test_barrel_side.png",
-    "beer_test_barrel_side.png", "beer_test_barrel_side.png", "beer_test_barrel_side.png"},
-    paramtype = "light",
-    paramtype2 = "facedir",
-    groups = {cracky=2},
-    sounds = default.node_sound_wood_defaults(),
-    use_texture_alpha = "blend",
-	on_punch = function(pos, node, puncher)
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_beer_grain" then
-			node.name = "beer_test:barrel_mixed_beer_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_beer_grain"))
-		end
-			
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_ale_grain" then
-			node.name = "beer_test:barrel_mixed_ale_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_ale_grain"))
-			
-		end
-		
-		local tool = puncher:get_wielded_item():get_name()
-		if tool and tool == "beer_test:mixed_mead_grain" then
-			node.name = "beer_test:barrel_mixed_mead_grain"
-			minetest.env:set_node(pos, node)
-			puncher:get_inventory():remove_item("main", ItemStack("beer_test:mixed_mead_grain"))
-			
-		end
-	end,
-    on_construct = function(pos)
-        local meta = minetest.get_meta(pos)
-        meta:set_string("infotext", "Barrel")
-    end,
-    node_box = {
-        type = "fixed",
-        fixed = {
-			{-0.375, -0.5, 0.3125, 0.4375, 0.5, 0.4375}, -- NodeBox1
-			{-0.4375, -0.5, -0.375, -0.3125, 0.5, 0.4375}, -- NodeBox2
-			{-0.4375, -0.5, -0.4375, 0.375, 0.5, -0.3125}, -- NodeBox3
-			{0.3125, -0.5, -0.4375, 0.4375, 0.5, 0.375}, -- NodeBox4
-			{-0.375, -0.4375, -0.375, 0.375, 0.4375, 0.375}, -- NodeBox5
-		}
-    },
-    selection_box = {
-        type = "fixed",
-        fixed = {
-            {-0.4375, -0.5, -0.4375, 0.4375, 0.5, 0.4375}, -- NodeBox1
-        },
-    }, 
-		
-})
-
-minetest.register_node("beer_test:brewing_barrel", {
-	description = "Brewing Barrel",
-	drawtype = "nodebox",
-    tiles = {"default_wood.png^beer_test_barrel_side.png", "default_wood.png^beer_test_barrel_side.png", "default_wood.png^beer_test_brewing_barrel_side.png",
-    "default_wood.png^beer_test_brewing_barrel_side.png", "default_wood.png^beer_test_brewing_barrel_front.png", "default_wood.png^beer_test_brewing_barrel_front.png"},
-    paramtype = "light",
-    paramtype2 = "facedir",
-    groups = {cracky=2},
-    sounds = default.node_sound_wood_defaults(),
-    use_texture_alpha = "blend",
-	drawtype = "nodebox",
-	paramtype = "light",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.375, -0.375, -0.5, 0.4375, -0.25, 0.5}, -- NodeBox2
-			{-0.4375, -0.375, -0.5, -0.3125, 0.4375, 0.5}, -- NodeBox3
-			{-0.4375, 0.375, -0.5, 0.375, 0.5, 0.5}, -- NodeBox4
-			{0.3125, -0.3125, -0.5, 0.4375, 0.5, 0.5}, -- NodeBox5
-			{-0.375, -0.3125, -0.4375, 0.4375, 0.4375, 0.4375}, -- NodeBox6
-			{-0.5, -0.5, 0.3125, 0.5, -0.375, 0.4375}, -- NodeBox8
-			{-0.5, -0.5, -0.4375, 0.5, -0.375, -0.3125}, -- NodeBox9
-		}
-	},
-	selection_box = {
-        type = "fixed",
-        fixed = {
-           -- {-0.437, -0.5, -0.5, 0.4375, 0.5, 0.5}, -- NodeBox1
-            {-0.437, -0.375, -0.5, 0.4375, 0.5, 0.5}, -- NodeBox1
-            {-0.5, -0.5, 0.3125, 0.5, -0.375, 0.4375}, -- NodeBox8
-			{-0.5, -0.5, -0.4375, 0.5, -0.375, -0.3125}, -- NodeBox9
-        },
-    }, 
-}) ]]--
 print("Beer_test: barrel.lua            [ok]")
