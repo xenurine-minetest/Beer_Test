@@ -3,6 +3,7 @@ local Sealable = beer_test.modules.Components.Sealable()
 local EventSystem = beer_test.modules.EventSystem()
 local PropertyStorage = beer_test.modules.PropertyStorage()
 local OpenedFormspecStorage = beer_test.modules.OpenedFormspecStorage()
+local RecipeRegistration = beer_test.register.Recipes()
 
 local function buildReceiveFieldsCommands(definition, properties)
     local commands = {
@@ -124,6 +125,100 @@ local getChangeEventHandler = function(definition, nodeName, nodeVariantNames)
     end
 end
 
+local getAllowInventoryPutCallback = function ()
+    return function (pos, listname, index, stack, player)
+        if (listname == "input") then
+            local recipe = RecipeRegistration.getSoakRecipesForItem(stack:get_name())
+            if(recipe == nil) then
+                return 0
+            end
+
+            if (recipe.inputVolume == 0) then
+                return stack:get_count()
+            end
+            
+            local properties = PropertyStorage.readonly(minetest.get_meta(pos))
+            local remainingSpace = properties.maxCapacity - properties.liquidLevel
+
+            local isenoughSpace = remainingSpace >= stack:get_count() * recipe.inputVolume
+
+            if(isenoughSpace) then
+                return stack:get_count()
+            end
+
+            return 0
+        end
+
+        return 0
+    end
+end
+
+local getInventoryPutCallback = function ()
+    return function (pos, listname, index, stack, player) 
+        if (listname ~= "input") then
+            return
+        end
+
+        local recipe = RecipeRegistration.getSoakRecipesForItem(stack:get_name())
+
+        if (recipe) then
+            minetest.get_node_timer(pos):start(recipe.processTime)
+        end
+    end
+end
+
+local getTimerCallback = function ()
+    return function(pos, elapsed)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        local input_stack = inv:get_stack("input", 1)
+
+        local recipe = RecipeRegistration.getSoakRecipesForItem(input_stack:get_name())
+
+        if (recipe == nil) then
+            return false
+        end
+
+        local properties = PropertyStorage.readonly(minetest.get_meta(pos))
+        local liquidRatio = properties.liquidLevel / input_stack:get_count()
+
+        if (liquidRatio < recipe.minLiquidRatio) then
+            return false
+        end
+
+        local drained = 0
+
+        PropertyStorage.write("dummyPlayer", pos, function (properties)
+            print(recipe.consumesLiquid)
+            if(Fillable.drain(properties, recipe.consumesLiquid)) then
+                drained = recipe.consumesLiquid
+                EventSystem.triggerEvent('fillStateChanged', pos, properties)
+            end
+        end)
+
+        if (drained == 0) then
+            return false
+        end
+
+        input_stack:take_item(1)
+        inv:set_stack("input", 1, input_stack)
+        
+        local output_stack = ItemStack(recipe.output)
+        
+        if inv:room_for_item("output", output_stack) then
+            inv:add_item("output", output_stack)
+        else
+            minetest.add_item(pos, output_stack)
+        end
+        
+        if (input_stack:get_count() >0 ) then
+            return true
+        end
+
+        return false
+    end
+end
+
 return function (nodeName, definition)
     local nodeVariantNames = {}
 
@@ -148,6 +243,9 @@ return function (nodeName, definition)
             on_punch = definition.on_punch,
             on_construct = definition.on_construct or getOnContructCallback(definition),
             on_rightclick = definition.on_rightclick or getrightClickCallback(nodeName, definition),
+            allow_metadata_inventory_put = getAllowInventoryPutCallback(),
+            on_metadata_inventory_put = getInventoryPutCallback(),
+            on_timer = getTimerCallback(),
             selection_box = definition.selection_box,
             drop = nodeName,
             tiles = variant.tiles,

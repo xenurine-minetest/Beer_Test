@@ -210,13 +210,21 @@ minetest.register_craft({
 
 farming.register_plant("beer_test:oats", {
 description = "Oat seed",
-inventory_image = "beer_test_oats.png",
+inventory_image = "beer_test_oats_seed.png",
 steps = 8,
 minlight = 13,
 maxlight = LIGHT_MAX,
 fertility = {"grassland"}
 })
 
+farming.register_plant("beer_test:barley", {
+	description = "Barley seed",
+	inventory_image = "beer_test_barley_seed.png",
+	steps = 8,
+	minlight = 13,
+	maxlight = LIGHT_MAX,
+	fertility = {"grassland"}
+	})
 -----------------
 -- wild plants --
 -----------------
@@ -231,6 +239,24 @@ minetest.register_node("beer_test:wild_oats", {
 	drawtype = "plantlike",
 	paramtype2 = "facedir",
 	tiles = {"beer_test_oats_8.png"},
+	groups = {chopspy=2, oddly_breakable_by_hand=3, flammable=2, plant=1},
+	sounds = default.node_sound_wood_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.35, 0.5}, -- side f
+		},
+	},
+})
+
+minetest.register_node("beer_test:wild_barley", {
+	description = "Wild Barley",
+	paramtype = "light",
+	walkable = false,
+	drop = "beer_test:seed_barley",
+	drawtype = "plantlike",
+	paramtype2 = "facedir",
+	tiles = {"beer_test_barley_8.png"},
 	groups = {chopspy=2, oddly_breakable_by_hand=3, flammable=2, plant=1},
 	sounds = default.node_sound_wood_defaults(),
 	selection_box = {

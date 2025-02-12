@@ -24,7 +24,8 @@ beer_test = {
         }
     },
     register = {
-        Fillable = lazyload(modulePath .. "/registerfillable.lua")
+        Fillable = lazyload(modulePath .. "/registerfillable.lua"),
+        Recipes = lazyload(modulePath .. "/registerrecipes.lua"),
     }
 }
 
@@ -49,6 +50,9 @@ dofile(minetest.get_modpath("beer_test").."/mod_files/beer.lua")
 
 print("Beer_test: Loading 'plants.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/plants.lua")
+
+print("Beer_test: Loading 'ingredients.lua'")
+dofile(minetest.get_modpath("beer_test").."/mod_files/ingredients.lua")
 
 print("Beer_test: Loading 'brewing_beer.lua'")
 dofile(minetest.get_modpath("beer_test").."/mod_files/brewing_beer.lua")
