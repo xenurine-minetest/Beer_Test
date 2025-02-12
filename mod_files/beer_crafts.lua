@@ -219,11 +219,11 @@ minetest.register_craft({
 	recipe = "beer_test:malt_tray_crystalised_malt",
 })
 
-minetest.register_craft({
+--[[minetest.register_craft({
 	type = "cooking",
 	output = "beer_test:oat_grain",
 	recipe = "beer_test:oats",
-})
+})]]
 
 ---------------
 -- functions --
@@ -285,7 +285,7 @@ if maxp.y >= 2 and minp.y <= 0 then
 		local x1 = minp.x + math.floor((divx+1)*divlen)
 		local z1 = minp.z + math.floor((divz+1)*divlen)
 		-- Determine hops amount from perlin noise
-		local hops_amount = math.floor(perlin1:get2d({x=x0, y=z0}) ^ 3 * 9)
+		local hops_amount = math.floor(perlin1:get2d({x=x0, y=z0}) ^ 3 * 9) --TODO: fix deprecated get2d()
 		-- Find random positions for hops based on this random
 		local pr = PseudoRandom(seed+1)
 		for i=0,hops_amount do
@@ -309,7 +309,7 @@ if maxp.y >= 2 and minp.y <= 0 then
 		local x1 = minp.x + math.floor((divx+1)*divlen)
 		local z1 = minp.z + math.floor((divz+1)*divlen)
 		-- Determine grass amount from perlin noise
-		local grass_amount = math.floor(perlin1:get2d({x=x0, y=z0}) ^ 1 * 5)
+		local grass_amount = math.floor(perlin1:get2d({x=x0, y=z0}) ^ 1 * 5) --TODO: fix deprecated get2d()
 		-- Find random positions for grass based on this random
 		local pr = PseudoRandom(seed+1)
 		for i=0,grass_amount do
