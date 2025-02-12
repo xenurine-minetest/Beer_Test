@@ -1,9 +1,9 @@
-local Fillable = beer_test.modules.Components.Fillable()
-local Sealable = beer_test.modules.Components.Sealable()
-local EventSystem = beer_test.modules.EventSystem()
-local PropertyStorage = beer_test.modules.PropertyStorage()
-local OpenedFormspecStorage = beer_test.modules.OpenedFormspecStorage()
-local RecipeRegistration = beer_test.register.Recipes()
+local Fillable = lc_api.modules.Components.Fillable()
+local Sealable = lc_api.modules.Components.Sealable()
+local EventSystem = lc_api.modules.EventSystem()
+local PropertyStorage = lc_api.modules.PropertyStorage()
+local OpenedFormspecStorage = lc_api.modules.OpenedFormspecStorage()
+local RecipeRegistration = lc_api.register.Recipes()
 
 local function buildReceiveFieldsCommands(definition, properties)
     local commands = {

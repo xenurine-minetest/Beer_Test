@@ -1,5 +1,5 @@
-local FillableRegistration = beer_test.register.Fillable()
-local ViewComponents = beer_test.modules.View.Components()
+local FillableRegistration = lc_api.register.Fillable()
+local ViewComponents = lc_api.modules.View.Components()
 
 local formspecs = {
 	unsealed = function(pos, properties)
