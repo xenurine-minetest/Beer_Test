@@ -41,11 +41,11 @@
 --- @class RecipeDefinition
 --- @field type string mandatory, can be "soak"
 --- @field input string mandatory, item name
---- @field liquidType string default=any
+--- @field liquidType? string default=any
 --- @field minLiquidRatio number mandatory
---- @field inputVolume number default=0
---- @field consumesLiquid number default=0
---- @field processTime number default=0
+--- @field inputVolume? number default=0
+--- @field consumesLiquid? number default=0
+--- @field processTime? number default=0
 
 --- @class FillableDefinition
 --- @field description string
