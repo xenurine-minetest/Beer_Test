@@ -1,3 +1,4 @@
+--- @class EventSystem
 local EventSystem = {
     handlers = {}
 }

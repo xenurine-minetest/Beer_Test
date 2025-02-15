@@ -1,6 +1,7 @@
 local liquidLevelField = "liquidLevel"
 local maxCapacityField = "maxCapacity"
 
+---@class Fillable
 local Fillable = {}
 
 local function isLiquidContainer(properties)

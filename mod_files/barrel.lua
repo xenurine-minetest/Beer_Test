@@ -1,4 +1,4 @@
-local FillableRegistration = lc_api.register.Fillable()
+local FillableRegistration = lc_api.Registrations.Fillable()
 local ViewComponents = lc_api.modules.View.Components()
 
 local formspecs = {

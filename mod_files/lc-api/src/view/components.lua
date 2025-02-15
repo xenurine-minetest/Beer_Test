@@ -1,3 +1,4 @@
+---@alias ComponenViewComponents.verticalBar fun(x: number, y: number, width: number, height:number, percent:number, texture:string): string
 local function verticalBar (x, y, width, height, percent, texture)
     local backGround = "image["..x..","..y..";"..width..","..height..";beer_test_bar_empty.png]"
     local foreGround = ""
@@ -12,6 +13,8 @@ local function verticalBar (x, y, width, height, percent, texture)
     return backGround .. foreGround
 end
 
+--- @class ViewComponents
+--- @field verticalBar ComponenViewComponents.verticalBar
 return {
     verticalBar = verticalBar
 }

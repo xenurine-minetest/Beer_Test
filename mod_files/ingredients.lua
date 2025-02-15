@@ -1,4 +1,4 @@
-local RecipeRegistration = lc_api.register.Recipes()
+local RecipeRegistration = lc_api.Registrations.Recipes()
 
 minetest.register_craftitem("beer_test:soaked_barley", {
     description = "Soaked barley",

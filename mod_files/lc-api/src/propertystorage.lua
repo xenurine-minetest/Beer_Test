@@ -1,6 +1,8 @@
 local locks = {}
 local queues = {}
 
+
+
 -- Locking system 
 local function acquireLock(pos, playerName)
     local strPos = minetest.pos_to_string(pos)
@@ -39,6 +41,7 @@ local function addToQueue(pos, playerName, accessCallback)
     })
 end
 
+--- @alias PropertyStorage.dequeuePlayer fun(pos: table, playerName: string): nil
 local function removeFromQueue(pos, playerName)
     local strPos = minetest.pos_to_string(pos)
     if (queues[strPos] == nil) then
@@ -54,6 +57,8 @@ local function removeFromQueue(pos, playerName)
 end
 
 -- Storage system
+
+--- @alias StorageSystem.readOnly fun(meta: table): table
 local function getProperties(meta)
     local propertiesDefinition = minetest.deserialize(meta:get_string("properties"))
 
@@ -121,6 +126,7 @@ local function access(playerName, pos, accessCallback)
     end
 end
 
+--- @alias StorageSystem.write fun(playerName: string, pos: table, accesCallback: function): nil
 local function write(playerName, pos, accessCallback)
     local meta = minetest.get_meta(pos)
     local properties = getProperties(meta) or {}
@@ -132,8 +138,17 @@ local function write(playerName, pos, accessCallback)
     setProperties(properties, meta)
 end
 
-return {
+--- @class PropertyStorage
+--- @field readOnly StorageSystem.readOnly
+--- @field write StorageSystem.write
+--- @field dequeuePlayer PropertyStorage.dequeuePlayer
+
+local PropertyStorage = {}
+
+PropertyStorage = {
     readonly = getProperties,
     write = write,
     dequeuePlayer = removeFromQueue
 }
+
+return PropertyStorage

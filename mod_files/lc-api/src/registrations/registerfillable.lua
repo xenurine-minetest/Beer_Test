@@ -2,8 +2,8 @@ local Fillable = lc_api.modules.Components.Fillable()
 local Sealable = lc_api.modules.Components.Sealable()
 local EventSystem = lc_api.modules.EventSystem()
 local PropertyStorage = lc_api.modules.PropertyStorage()
-local OpenedFormspecStorage = lc_api.modules.OpenedFormspecStorage()
-local RecipeRegistration = lc_api.register.Recipes()
+local OpenedFormspecStorage = lc_api.modules.View.OpenedFormspecStorage()
+local RecipeRegistration = lc_api.Registrations.Recipes()
 
 local function buildReceiveFieldsCommands(definition, properties)
     local commands = {
@@ -11,7 +11,7 @@ local function buildReceiveFieldsCommands(definition, properties)
 			Fillable.fill(properties, amount)
 		end,
         drain = function (amount)
-			Sealable.drain(properties, amount)
+			Fillable.drain(properties, amount)
 		end
     }
 
@@ -27,7 +27,7 @@ local function buildReceiveFieldsCommands(definition, properties)
     return commands
 end
 
-local getOnContructCallback = function(definition)
+local getOnConstructCallback = function(definition)
     return function (pos) 
         PropertyStorage.write("dummyPlayer", pos, function (properties)
             Fillable.create(properties, definition.maxCapacity or 10)
@@ -49,7 +49,7 @@ local getOnContructCallback = function(definition)
     end
 end
 
-local function getrightClickCallback(nodeName, definition)
+local function getRightClickCallback(nodeName, definition)
     return function(pos, node, clicker, itemstack, pointed_thing) 
         local playerName = clicker:get_player_name()
             local item = clicker:get_wielded_item():get_name()
@@ -219,6 +219,7 @@ local getTimerCallback = function ()
     end
 end
 
+---@alias FillableRegistration fun(nodeName: string, definition: FillableDefinition): nil
 return function (nodeName, definition)
     local nodeVariantNames = {}
 
@@ -241,8 +242,8 @@ return function (nodeName, definition)
             sounds = definition.sounds,
             use_texture_alpha = definition.use_texture_alpha,
             on_punch = definition.on_punch,
-            on_construct = definition.on_construct or getOnContructCallback(definition),
-            on_rightclick = definition.on_rightclick or getrightClickCallback(nodeName, definition),
+            on_construct = definition.on_construct or getOnConstructCallback(definition),
+            on_rightclick = definition.on_rightclick or getRightClickCallback(nodeName, definition),
             allow_metadata_inventory_put = getAllowInventoryPutCallback(),
             on_metadata_inventory_put = getInventoryPutCallback(),
             on_timer = getTimerCallback(),

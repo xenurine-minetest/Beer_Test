@@ -1,0 +1,7 @@
+{
+    "Lua.workspace.checkThirdParty": "",
+    "Lua.workspace.library": [
+        "~/.minetest/mods/beer_test/"
+    ],
+    "minetest-tools.workspaceOnly": false
+}

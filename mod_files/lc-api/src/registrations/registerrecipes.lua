@@ -1,5 +1,7 @@
+---@type RecipeDefinition[]
 local soakRepipes = {}
 
+---@alias RecipeRegistration.registerRecipe fun(recipeDefinition: RecipeDefinition): nil
 local function registerRecipe(recipeDefinition)
     if (recipeDefinition.type == 'soak') then
         table.insert(soakRepipes, {
@@ -14,6 +16,7 @@ local function registerRecipe(recipeDefinition)
     end
 end
 
+---@alias RecipeRegistration.getSoakRecipesForItem fun(item: string): nil|RecipeDefinition
 local function getSoakRecipesForItem(item)
     print(dump2(soakRepipes, "allrecipes"))
     for _,recipe in ipairs(soakRepipes) do
@@ -25,6 +28,9 @@ local function getSoakRecipesForItem(item)
     return nil
 end
 
+---@class RecipeRegistration
+---@field registerRecipe RecipeRegistration.registerRecipe
+---@field getSoakRecipesForItem RecipeRegistration.getSoakRecipesForItem
 return {
     registerRecipe = registerRecipe,
     getSoakRecipesForItem = getSoakRecipesForItem

@@ -1,3 +1,4 @@
+---@class Sealable
 local Sealable = {}
 
 local sealedField = "sealed"

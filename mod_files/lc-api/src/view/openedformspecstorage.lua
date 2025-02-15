@@ -1,6 +1,7 @@
 local cacheTable = {}
 
-local OpenedFormspecCache = {}
+--- @class OpenedFormspecStorage
+local OpenedFormspecStorage = {}
 
 local function tablesEquals(table1, table2)
     for k,v in pairs(table1) do
@@ -24,11 +25,11 @@ local function removeByPos(pos)
     end
 end
 
-OpenedFormspecCache.add = function (pos, playerName)
+OpenedFormspecStorage.add = function (pos, playerName)
     cacheTable[playerName] = pos
 end
 
-OpenedFormspecCache.getPosByPlayer = function (playerName)
+OpenedFormspecStorage.getPosByPlayer = function (playerName)
     for k,v in pairs(cacheTable) do
         if (k == playerName) then
             return v
@@ -38,7 +39,7 @@ OpenedFormspecCache.getPosByPlayer = function (playerName)
     return nil
 end
 
-OpenedFormspecCache.getPlayerNamesByPos = function (pos)
+OpenedFormspecStorage.getPlayerNamesByPos = function (pos)
     local foundPlayerNames = {}
 
     for playerName, savedPos in pairs(cacheTable) do
@@ -50,7 +51,7 @@ OpenedFormspecCache.getPlayerNamesByPos = function (pos)
     return foundPlayerNames
 end
 
-OpenedFormspecCache.remove = function (pos, playerName)
+OpenedFormspecStorage.remove = function (pos, playerName)
     if (playerName == nil) then
         removeByPos(pos)
     else
@@ -58,8 +59,8 @@ OpenedFormspecCache.remove = function (pos, playerName)
     end
 end
 
-OpenedFormspecCache.debug = function()
+OpenedFormspecStorage.debug = function()
     print(dump2(cacheTable, "openforms"))
 end
 
-return OpenedFormspecCache
+return OpenedFormspecStorage
