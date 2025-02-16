@@ -18,6 +18,7 @@
 --- @class Api.modules.Components
 --- @field Fillable fun(): Fillable
 --- @field Sealable fun(): Sealable
+--- @field CanSoak fun(): CanSoak
 
 --- @class Api.modules.View
 --- @field Components fun(): ViewComponents
@@ -60,6 +61,6 @@
 --- @field variants table
 --- @field maxCapacity? number
 --- @field sealable boolean
---- @field inventories table
+--- @field inventories? table
 --- @field formspec function
 --- @field on_receive_fields function

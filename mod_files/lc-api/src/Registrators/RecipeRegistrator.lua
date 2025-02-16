@@ -18,7 +18,6 @@ end
 
 ---@alias RecipeRegistration.getSoakRecipesForItem fun(item: string): nil|RecipeDefinition
 local function getSoakRecipesForItem(item)
-    print(dump2(soakRepipes, "allrecipes"))
     for _,recipe in ipairs(soakRepipes) do
         if (recipe.input == item) then
             return recipe

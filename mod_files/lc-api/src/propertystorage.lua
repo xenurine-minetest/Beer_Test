@@ -2,9 +2,8 @@ local locks = {}
 local queues = {}
 
 
-
--- Locking system 
-local function acquireLock(pos, playerName)
+local LockingSystem = {}
+LockingSystem.acquireLock = function (pos, playerName)
     local strPos = minetest.pos_to_string(pos)
 
     if (locks[strPos]) then
@@ -15,7 +14,7 @@ local function acquireLock(pos, playerName)
     return true
 end
 
-local function releaseLock(pos)
+LockingSystem.releaseLock = function(pos)
     local strPos = minetest.pos_to_string(pos)
     locks[strPos] = nil
 
@@ -25,13 +24,13 @@ local function releaseLock(pos)
         local nextAction = nextEntry.accessCallback
         print("It's" .. nextPlayer .. "'s turn")
         minetest.after(0, function ()
-            processAction(nextPlayer, pos, nextAction)
+            LockingPropertyStorage.write(nextPlayer, pos, nextAction)
         end)
         print(nextPlayer .. "has done its action")
     end
 end
 
-local function addToQueue(pos, playerName, accessCallback)
+LockingSystem.addToQueue = function(pos, playerName, accessCallback)
     local strPos = minetest.pos_to_string(pos)
     queues[strPos] = queues[strPos] or {}
 
@@ -41,8 +40,7 @@ local function addToQueue(pos, playerName, accessCallback)
     })
 end
 
---- @alias PropertyStorage.dequeuePlayer fun(pos: table, playerName: string): nil
-local function removeFromQueue(pos, playerName)
+LockingSystem.removeFromQueue = function(pos, playerName)
     local strPos = minetest.pos_to_string(pos)
     if (queues[strPos] == nil) then
         return
@@ -56,10 +54,8 @@ local function removeFromQueue(pos, playerName)
     end
 end
 
--- Storage system
-
---- @alias StorageSystem.readOnly fun(meta: table): table
-local function getProperties(meta)
+local PropertyStorage = {}
+PropertyStorage.getProperties = function(meta)
     local propertiesDefinition = minetest.deserialize(meta:get_string("properties"))
 
     if(propertiesDefinition == nil) then
@@ -84,7 +80,7 @@ local function getProperties(meta)
     return properties
 end
 
-local function setProperties(properties, meta)
+PropertyStorage.setProperties = function(properties, meta)
     local propertiesDefinition = {}
 
     for property, value in pairs(properties) do
@@ -107,10 +103,10 @@ local function setProperties(properties, meta)
     meta:set_string("properties", minetest.serialize(propertiesDefinition))
 end
 
--- Combines locking and storage to locking storage
+
 local function access(playerName, pos, accessCallback)
-    if (not acquireLock(pos, playerName)) then
-        addToQueue(pos, playerName, accessCallback)
+    if (not LockingSystem.acquireLock(pos, playerName)) then
+        LockingSystem.addToQueue(pos, playerName, accessCallback)
         print(playerName .. " must wait")
         return
     end
@@ -119,36 +115,32 @@ local function access(playerName, pos, accessCallback)
         accessCallback()
     end)
 
-    releaseLock(pos)
+    LockingSystem.releaseLock(pos)
 
     if (not success) then
         minetest.log("error", err)
     end
 end
 
---- @alias StorageSystem.write fun(playerName: string, pos: table, accesCallback: function): nil
-local function write(playerName, pos, accessCallback)
+LockingPropertyStorage = {}
+
+LockingPropertyStorage.write = function(playerName, pos, accessCallback)
     local meta = minetest.get_meta(pos)
-    local properties = getProperties(meta) or {}
+    local properties = PropertyStorage.getProperties(meta) or {}
 
     access(playerName, pos, function ()
         accessCallback(properties)
     end)
 
-    setProperties(properties, meta)
+    PropertyStorage.setProperties(properties, meta)
 end
 
---- @class PropertyStorage
---- @field readOnly StorageSystem.readOnly
---- @field write StorageSystem.write
---- @field dequeuePlayer PropertyStorage.dequeuePlayer
+LockingPropertyStorage.readonly = function(meta)
+    return PropertyStorage.getProperties(meta)
+end
 
-local PropertyStorage = {}
+LockingPropertyStorage.dequeuePlayer = function (pos, playerName)
+    return LockingSystem.removeFromQueue(pos, playerName)
+end
 
-PropertyStorage = {
-    readonly = getProperties,
-    write = write,
-    dequeuePlayer = removeFromQueue
-}
-
-return PropertyStorage
+return LockingPropertyStorage

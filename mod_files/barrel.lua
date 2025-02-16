@@ -44,13 +44,11 @@ FillableRegistration("beer_test:barrel", {
     sounds = default.node_sound_wood_defaults(),
     use_texture_alpha = "blend",
 	sealable = true,
+	fillable = true,
+	canSoak = true,
 	inventories = {
 		input = 1,
 		output = 1
-	},
-	canSoak = {
-		inputInventory = "input",
-		outputInventory = "output"
 	},
 	variants = {
 		empty = {
@@ -180,6 +178,7 @@ FillableRegistration("beer_test:barrel", {
 		end
 	end,
 	on_receive_fields = function (fields, commands)
+		print(dump2(commands, "commands"))
 		if (fields.seal) then
 			commands.seal()
 		end

@@ -18,7 +18,8 @@ lc_api = {
     modules = {
         Components = {
             Fillable = lazyload(modulePath .. "/components/fillable.lua"),
-            Sealable = lazyload(modulePath .. "/components/sealable.lua")
+            Sealable = lazyload(modulePath .. "/components/sealable.lua"),
+            CanSoak = lazyload(modulePath .. "/components/canSoak.lua"),
         },
         EventSystem = lazyload(modulePath .. "/eventsystem.lua"),
         PropertyStorage = lazyload(modulePath .. "/propertystorage.lua"),
@@ -29,8 +30,13 @@ lc_api = {
         }
     },
     Registrations = {
-        Fillable = lazyload(modulePath .. "/registrations/registerfillable.lua"),
-        Recipes = lazyload(modulePath .. "/registrations/registerrecipes.lua"),
-        Components = lazyload(modulePath .. "/registrations/registercomponent.lua"),
+        Fillable = lazyload(modulePath .. "/Registrators/LiquidContainerRegistrator.lua"),
+        Recipes = lazyload(modulePath .. "/Registrators/RecipeRegistrator.lua"),
+        Components = lazyload(modulePath .. "/Registrators/ComponentRegistrator.lua"),
     }
 }
+
+dofile(modulePath .. "/registerComponents.lua")
+
+-- Register Components
+
