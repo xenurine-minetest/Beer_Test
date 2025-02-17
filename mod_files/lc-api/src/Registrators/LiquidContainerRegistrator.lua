@@ -62,9 +62,6 @@ local function getRightClickCallback(nodeName, nodeDefinition)
             ComponentRegistrator.iterators.doIfNodeHasComponent(nodeDefinition, function (componentDefinition)
                 if (type(componentDefinition.onRightClick) == "function" and componentDefinition.usesStorage) then
                     rightClickActionDone = componentDefinition.onRightClick(pos, clicker, properties)
-                    if (rightClickActionDone) then
-                        EventSystem.triggerEvent('fillStateChanged', pos, properties)
-                    end
                 end
             end)
         end)
@@ -80,7 +77,7 @@ local function getRightClickCallback(nodeName, nodeDefinition)
             nodeName,
             nodeDefinition.formspec(
                 pos,
-                PropertyStorage.readonly(minetest.get_meta(pos))
+                PropertyStorage.readOnly(pos)
             )
         )
     end
@@ -104,20 +101,26 @@ local function getRecieveFieldCallback(nodeName, definition)
 		if (pos ~= nil) then
             PropertyStorage.write(playerName, pos, function (properties)
                 definition.on_receive_fields(fields, buildReceiveFieldsCommands(definition, properties))
-                EventSystem.triggerEvent('fillStateChanged', pos, properties)
             end)
 		end
     end
 end
 
 local getChangeEventHandler = function(definition, nodeName, nodeVariantNames)
-    return function(pos, properties)
+    return function(pos, properties, eventContext)
         definition.onChange(pos, properties, nodeVariantNames)
+
+        ComponentRegistrator.iterators.doIfNodeHasComponent(definition, function(componentDefinition, registrationProperty)
+            if (type(componentDefinition.onChange) == "function") then
+                componentDefinition.onChange(pos, properties, eventContext)
+            end
+        end)
 
         local playerNames = OpenedFormspecStorage.getPlayerNamesByPos(pos)
         for _,playerName in ipairs(playerNames) do
-            minetest.show_formspec(playerName,nodeName,definition.formspec(pos, properties))
+            minetest.show_formspec(playerName,nodeName,definition.formspec(pos, properties, eventContext))
         end
+
     end
 end
 
@@ -150,12 +153,17 @@ end
 
 local getTimerCallback = function (nodeDefinition)
     return function(pos, elapsed)
+        local timerResult = false
+
         ComponentRegistrator.iterators.doIfNodeHasComponent(nodeDefinition, function(componentDefinition)
             if(type(componentDefinition.timer) == "function") then
-                componentDefinition.timer(pos, elapsed)
+                timerResult = timerResult or componentDefinition.timer(pos, elapsed)
             end
         end)
+
+        return timerResult
     end
+    
 end
 
 
@@ -219,7 +227,7 @@ return function (nodeName, definition)
     end
 
     EventSystem.registerEvent(
-        "fillStateChanged",
+        "changed",
         getChangeEventHandler(definition, nodeName, nodeVariantNames)
     )
 

@@ -1,3 +1,5 @@
+local EventSystem = lc_api.modules.EventSystem()
+
 ---@class Sealable
 local Sealable = {}
 
@@ -26,6 +28,7 @@ Sealable.seal = function (properties)
 
     properties[sealedField] = true
 
+    EventSystem.triggerEvent('changed', properties.pos, properties)
     return true
 end
 
@@ -41,6 +44,7 @@ Sealable.unseal = function (properties)
 
     properties[sealedField] = false
 
+    EventSystem.triggerEvent('changed', properties.pos, properties)
     return true
 end
 

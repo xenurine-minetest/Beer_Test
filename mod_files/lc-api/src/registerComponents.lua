@@ -20,7 +20,7 @@ ComponentRegistrator.registerStorageComponents('fillable', {
             if (Fillable.fill(properties, 1)) then
                 clicker:get_inventory():remove_item("main", ItemStack("bucket:bucket_water"))
             end
-            
+                
             return true
         end
 
@@ -90,5 +90,16 @@ ComponentRegistrator.registerStorageComponents('canSoak', {
     },
     timer = function(pos, elapsed)
         return CanSoak.soak(pos)
+    end,
+    onChange = function(pos, properties, eventContext) 
+        if (eventContext and eventContext.actor == "canSoak") then
+            return false
+        end
+
+        local inventory = minetest.get_inventory({type = "node", pos = pos})
+        local itemStacks = inventory:get_list("input")
+        for _,itemStack in ipairs(itemStacks) do
+            CanSoak.takeSoakingItem(pos, itemStack)
+        end
     end
 })

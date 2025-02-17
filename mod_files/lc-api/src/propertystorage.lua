@@ -55,7 +55,8 @@ LockingSystem.removeFromQueue = function(pos, playerName)
 end
 
 local PropertyStorage = {}
-PropertyStorage.getProperties = function(meta)
+PropertyStorage.getProperties = function(pos)
+    local meta = minetest.get_meta(pos)
     local propertiesDefinition = minetest.deserialize(meta:get_string("properties"))
 
     if(propertiesDefinition == nil) then
@@ -77,6 +78,8 @@ PropertyStorage.getProperties = function(meta)
         end
     end
 
+    properties.pos = pos
+
     return properties
 end
 
@@ -84,20 +87,27 @@ PropertyStorage.setProperties = function(properties, meta)
     local propertiesDefinition = {}
 
     for property, value in pairs(properties) do
-        propertiesDefinition[property] = type(value)
+        (function ()
+            if (property == "pos") then
+                return
+            end
 
-        if (type(value) == "string") then
-            meta:set_string(property, value)
-        end
+            propertiesDefinition[property] = type(value)
 
-        if (type(value) == "number") then
-            meta:set_int(property, value)
-        end
+            if (type(value) == "string") then
+                meta:set_string(property, value)
+            end
 
-        if (type(value) == "boolean") then
-            value = (value == true and 1 or 0 )
-            meta:set_string(property, value)
-        end
+            if (type(value) == "number") then
+                meta:set_int(property, value)
+            end
+
+            if (type(value) == "boolean") then
+                value = (value == true and 1 or 0 )
+                meta:set_string(property, value)
+            end
+        end)()
+        
     end
     
     meta:set_string("properties", minetest.serialize(propertiesDefinition))
@@ -122,11 +132,13 @@ local function access(playerName, pos, accessCallback)
     end
 end
 
+--- @class LockingPropertyStorage
+--- @alias LockingStorage LockingPropertyStorage
 LockingPropertyStorage = {}
 
 LockingPropertyStorage.write = function(playerName, pos, accessCallback)
     local meta = minetest.get_meta(pos)
-    local properties = PropertyStorage.getProperties(meta) or {}
+    local properties = PropertyStorage.getProperties(pos) or {}
 
     access(playerName, pos, function ()
         accessCallback(properties)
@@ -135,8 +147,8 @@ LockingPropertyStorage.write = function(playerName, pos, accessCallback)
     PropertyStorage.setProperties(properties, meta)
 end
 
-LockingPropertyStorage.readonly = function(meta)
-    return PropertyStorage.getProperties(meta)
+LockingPropertyStorage.readOnly = function(pos)
+    return PropertyStorage.getProperties(pos)
 end
 
 LockingPropertyStorage.dequeuePlayer = function (pos, playerName)

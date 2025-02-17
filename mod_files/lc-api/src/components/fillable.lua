@@ -1,8 +1,10 @@
-local liquidLevelField = "liquidLevel"
-local maxCapacityField = "maxCapacity"
+local EventSystem = lc_api.modules.EventSystem()
 
 ---@class Fillable
 local Fillable = {}
+
+local liquidLevelField = "liquidLevel"
+local maxCapacityField = "maxCapacity"
 
 local function isLiquidContainer(properties)
     if (properties[liquidLevelField] == nil or properties[maxCapacityField] == nil) then
@@ -17,7 +19,7 @@ Fillable.create = function (properties, maxCapacity)
     properties[maxCapacityField] = maxCapacity
 end
 
-Fillable.fill = function(properties, amount)
+Fillable.fill = function(properties, amount, eventContext)
     if(isLiquidContainer(properties) == false) then
         return false
     end
@@ -27,11 +29,12 @@ Fillable.fill = function(properties, amount)
     end
 
     properties[liquidLevelField] = properties[liquidLevelField] + amount
+    EventSystem.triggerEvent('changed', properties.pos, properties, eventContext or {})
 
     return true
 end
 
-Fillable.drain = function(properties, amount)
+Fillable.drain = function(properties, amount, eventContext)
     if(isLiquidContainer(properties) == false) then
         return false
     end
@@ -41,6 +44,7 @@ Fillable.drain = function(properties, amount)
     end
 
     properties[liquidLevelField] = properties[liquidLevelField] - amount
+    EventSystem.triggerEvent('changed', properties.pos, properties, eventContext or {})
 
     return true
 end
