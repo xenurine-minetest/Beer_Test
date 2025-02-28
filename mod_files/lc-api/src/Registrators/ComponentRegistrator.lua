@@ -1,3 +1,4 @@
+local EventSystem = lc_api.modules.EventSystem()
 
 ---@class ComponentRegistration
 local ComponentRegistrator = {}
@@ -40,6 +41,26 @@ end
 
 function ComponentRegistrator.getStorageComponents()
     return components
+end
+
+ComponentRegistrator.initialize = function()
+    print("initialize")
+    for componentName, component in pairs(components) do
+        print(componentName)
+        if(component.events ~= nil) then
+            print("has events")
+            for _, eventName in ipairs(component.events) do
+                print("registering " .. eventName)
+                EventSystem.registerEvent(eventName)
+            end
+        end
+
+        if(type(component.onEvent) == "table") then
+            for eventName, callback in pairs(component.onEvent) do
+                EventSystem.addListener(eventName, callback)
+            end
+        end
+    end
 end
 
 ComponentRegistrator.iterators = {

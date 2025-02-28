@@ -133,10 +133,13 @@ local function access(playerName, pos, accessCallback)
 end
 
 --- @class LockingPropertyStorage
---- @alias LockingStorage LockingPropertyStorage
 LockingPropertyStorage = {}
 
-LockingPropertyStorage.write = function(playerName, pos, accessCallback)
+---writes properties race condition safe
+---@param playerName string
+---@param pos table
+---@param accessCallback function
+function LockingPropertyStorage.write (playerName, pos, accessCallback)
     local meta = minetest.get_meta(pos)
     local properties = PropertyStorage.getProperties(pos) or {}
 
@@ -147,12 +150,19 @@ LockingPropertyStorage.write = function(playerName, pos, accessCallback)
     PropertyStorage.setProperties(properties, meta)
 end
 
-LockingPropertyStorage.readOnly = function(pos)
+---get nodes properties
+---@param pos table
+---@return table|nil
+function LockingPropertyStorage.readOnly(pos)
     return PropertyStorage.getProperties(pos)
 end
 
-LockingPropertyStorage.dequeuePlayer = function (pos, playerName)
-    return LockingSystem.removeFromQueue(pos, playerName)
+---removes player from locking queue
+---@param pos table
+---@param playerName string
+---@return nil
+function LockingPropertyStorage.dequeuePlayer(pos, playerName)
+    LockingSystem.removeFromQueue(pos, playerName)
 end
 
 return LockingPropertyStorage

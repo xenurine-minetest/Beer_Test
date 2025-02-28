@@ -1,9 +1,15 @@
 local FillableRegistration = lc_api.Registrations.Fillable()
 local ViewComponents = lc_api.modules.View.Components()
+local CanSoakModel = lc_api.modules.Components.CanSoak()
 
 local formspecs = {
 	unsealed = function(pos, properties)
-		local levelString = properties.liquidLevel .. " of " .. properties.maxCapacity .. " L"
+		
+		local inputVolume = CanSoakModel.getInventoryVolume(pos, "input")
+		local outputVolume = CanSoakModel.getInventoryVolume(pos, "output")
+		local totalVolume = inputVolume + outputVolume + properties.liquidLevel
+
+		local levelString = totalVolume .. " of " .. properties.maxCapacity .. " L"
 
 		
 		return  "formspec_version[8]"..
@@ -11,7 +17,20 @@ local formspecs = {
 				"position[0.5,0.5]"..
 				"anchor[0.5,0.5]"..
 				"padding[0.1,0.1]"..
-				ViewComponents.verticalBar(0.5,1,1,3,(properties.liquidLevel/properties.maxCapacity*100), "beer_test_bar_blue.png")..
+				ViewComponents.soakVerticalBar(0.5,1,1,3,
+					{
+						percent = inputVolume/properties.maxCapacity*100,
+						texture = "beer_test_wheat_tray.png"
+					},
+					{
+						percent = properties.liquidLevel/properties.maxCapacity*100,
+						texture = "default_river_water.png"
+					},
+					{
+						percent = outputVolume/properties.maxCapacity*100,
+						texture = "beer_test_wheat_tray_dryed.png"
+					}
+				)..
 				"label[0.5,0.5; Level: " .. levelString .. "]" ..
 				"button[2.0,2.0;2,1;seal;Seal]"..
 				"list[nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. ";input;4.5,1;1,1;]" ..
@@ -21,14 +40,31 @@ local formspecs = {
 	end,
 
 	sealed = function(pos, properties)
-		local levelString = properties.liquidLevel .. " of " .. properties.maxCapacity .. " L"
+		local inputVolume = CanSoakModel.getInventoryVolume(pos, "input")
+		local outputVolume = CanSoakModel.getInventoryVolume(pos, "output")
+		local totalVolume = inputVolume + outputVolume + properties.liquidLevel
+
+		local levelString = totalVolume .. " of " .. properties.maxCapacity .. " L"
 		
 		return  "formspec_version[8]"..
 				"size[11,10]" ..
 				"position[0.5,0.5]"..
 				"anchor[0.5,0.5]"..
 				"padding[0.1,0.1]"..
-				ViewComponents.verticalBar(0.5,1,1,3,(properties.liquidLevel/properties.maxCapacity*100), "beer_test_bar_blue.png")..
+				ViewComponents.soakVerticalBar(0.5,1,1,3,
+					{
+						percent = inputVolume/properties.maxCapacity*100,
+						texture = "beer_test_wheat_tray.png"
+					},
+					{
+						percent = properties.liquidLevel/properties.maxCapacity*100,
+						texture = "default_river_water.png"
+					},
+					{
+						percent = outputVolume/properties.maxCapacity*100,
+						texture = "beer_test_wheat_tray_dryed.png"
+					}
+				)..
 				"label[0.5,0.5; Level: " .. levelString .. "]" ..
 				"button[2.0,2.0;2,1;unseal;Unseal]"..
 				"label[4.5,2; Sealed barrel will process stuff ...]" ..
@@ -116,8 +152,10 @@ FillableRegistration("beer_test:barrel", {
 	onChange = function (pos, properties, variants)
 		local node = minetest.get_node(pos)
 		local meta = minetest.get_meta(pos)
+		local totalVolume = CanSoakModel.getTotalVolume(properties)
 
-		local infoText = "Barrel (" .. properties.liquidLevel .. "/" .. properties.maxCapacity .. "L)"
+		print("refresh infotext")
+		local infoText = "Barrel (" .. totalVolume .. "/" .. properties.maxCapacity .. "L)"
 		meta:set_string("infotext", infoText)
 
 		if(properties.liquidLevel == 0) then

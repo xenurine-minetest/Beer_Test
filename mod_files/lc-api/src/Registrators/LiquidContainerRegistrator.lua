@@ -53,7 +53,9 @@ local getOnConstructCallback = function(nodeDefinition)
 end
 
 local function getRightClickCallback(nodeName, nodeDefinition)
+    print("right click1")
     return function(pos, node, clicker, itemstack, pointed_thing) 
+        print("right click2")
         local playerName = clicker:get_player_name()
 
         local rightClickActionDone = false
@@ -66,7 +68,10 @@ local function getRightClickCallback(nodeName, nodeDefinition)
             end)
         end)
 
+        print("right click4")
+
         if (rightClickActionDone) then
+            print("right click5")
             return
         end
 
@@ -106,20 +111,49 @@ local function getRecieveFieldCallback(nodeName, definition)
     end
 end
 
-local getChangeEventHandler = function(definition, nodeName, nodeVariantNames)
-    return function(pos, properties, eventContext)
-        definition.onChange(pos, properties, nodeVariantNames)
+local function refreshNodeFormspecs(nodeName, nodeDefinition, eventName, eventDetails)
+    local playerNames = OpenedFormspecStorage.getPlayerNamesByPos(eventDetails.nodeProperties.pos)
+    for _,playerName in ipairs(playerNames) do
+        minetest.show_formspec(
+            playerName,
+            nodeName,
+            nodeDefinition.formspec( -- TODO: refactor formspec call parameters!
+                eventDetails.nodeProperties.pos,
+                eventDetails.nodeProperties,
+                eventDetails,
+                eventName
+            )
+        )
+    end
+end
 
-        ComponentRegistrator.iterators.doIfNodeHasComponent(definition, function(componentDefinition, registrationProperty)
-            if (type(componentDefinition.onChange) == "function") then
-                componentDefinition.onChange(pos, properties, eventContext)
+local function runComponentEventCallbacks(nodeDefinition, eventName, eventDetails)
+    ComponentRegistrator.iterators.doIfNodeHasComponent(nodeDefinition, function(componentDefinition, _)
+        if (type(componentDefinition.onEvent) == "table") then
+            if (type(componentDefinition.onEvent.all) == "function") then
+                componentDefinition.onEvent.all(eventName, eventDetails)
             end
-        end)
-
-        local playerNames = OpenedFormspecStorage.getPlayerNamesByPos(pos)
-        for _,playerName in ipairs(playerNames) do
-            minetest.show_formspec(playerName,nodeName,definition.formspec(pos, properties, eventContext))
         end
+    end)
+end
+
+local getEventObserverHandler = function(nodeDefinition, nodeName, nodeVariantNames) --TODO: refactor this!
+    return function(eventName, eventDetails)
+        if (string.sub(eventName, 1, 3) == "pre") then
+            return
+        end
+        print("event triggered: "..eventName)
+        
+        nodeDefinition.onChange(
+            eventDetails.nodeProperties.pos,
+            eventDetails.nodeProperties,
+            nodeVariantNames,
+            eventName
+        )
+
+        runComponentEventCallbacks(nodeDefinition, eventName, eventDetails)
+
+        refreshNodeFormspecs(nodeName, nodeDefinition, eventName, eventDetails)
 
     end
 end
@@ -151,6 +185,18 @@ local getInventoryPutCallback = function (nodeDefinition)
     end
 end
 
+local getInventoryTakeCallback = function (nodeDefinition)
+    return function (pos, listname, index, stack, player) 
+        ComponentRegistrator.iterators.doIfNodeHasComponent(nodeDefinition, function(componentDefinition)
+            for inventoryName, inventoryConfig in pairs(componentDefinition.neededInventories) do
+                if(type(inventoryConfig.take) == "function" and inventoryName == listname) then
+                    inventoryConfig.take(pos, index, stack, player)
+                end
+            end
+        end)
+    end
+end
+
 local getTimerCallback = function (nodeDefinition)
     return function(pos, elapsed)
         local timerResult = false
@@ -165,7 +211,6 @@ local getTimerCallback = function (nodeDefinition)
     end
     
 end
-
 
 local function mergeToTable(tableFrom, tableTo)
     for propertyName, value in pairs (tableFrom) do
@@ -204,6 +249,7 @@ return function (nodeName, definition)
             on_rightclick = definition.on_rightclick or getRightClickCallback(nodeName, definition),
             allow_metadata_inventory_put = getAllowInventoryPutCallback(definition),
             on_metadata_inventory_put = getInventoryPutCallback(definition),
+            on_metadata_inventory_take = getInventoryTakeCallback(definition),
             on_timer = getTimerCallback(definition),
             selection_box = definition.selection_box,
             drop = nodeName,
@@ -226,9 +272,8 @@ return function (nodeName, definition)
         minetest.register_node(nodeVariantName, variantRegistration)
     end
 
-    EventSystem.registerEvent(
-        "changed",
-        getChangeEventHandler(definition, nodeName, nodeVariantNames)
+    EventSystem.addObserver(
+        getEventObserverHandler(definition, nodeName, nodeVariantNames)
     )
 
     minetest.register_on_player_receive_fields(

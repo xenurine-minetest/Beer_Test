@@ -9,7 +9,6 @@ local function registerRecipe(recipeDefinition)
             output = recipeDefinition.output,
             liquidType = (recipeDefinition.liquidType == nil and 'any' or recipeDefinition.liquidType),
             minLiquidRatio = recipeDefinition.minLiquidRatio,
-            inputVolume = (recipeDefinition.inputVolume == nil and 0 or recipeDefinition.inputVolume),
             consumesLiquid = (recipeDefinition.consumesLiquid == nil and 0 or recipeDefinition.consumesLiquid),
             processTime = (recipeDefinition.processTime == nil and 0 or recipeDefinition.processTime),
         })

@@ -8,12 +8,13 @@
 --- @field Fillable fun(): FillableRegistration
 --- @field Recipes fun(): RecipeRegistration
 --- @field Components fun(): ComponentRegistration
+--- @field Items fun(): ItemRegistrator
 
 --- @class Api.modules
 --- @field Components Api.modules.Components
 --- @field View Api.modules.View
 --- @field EventSystem fun(): EventSystem
---- @field PropertyStorage fun(): PropertyStorage
+--- @field PropertyStorage fun(): LockingPropertyStorage
 
 --- @class Api.modules.Components
 --- @field Fillable fun(): Fillable
@@ -38,6 +39,9 @@
 
 
 --- Definitions
+--- @class ItemDefinition
+--- @field itemName string
+--- @field volume? number default=0
 
 --- @class RecipeDefinition
 --- @field type string mandatory, can be "soak"
